@@ -13,7 +13,8 @@ class KeyboardButton extends StatefulWidget {
     this.disabledColor = PlateStyles.keyboardButtonDisabledColorDark,
     this.borderRadius = const BorderRadius.all(Radius.circular(8.0)),
     @required this.onPressed,
-  })  : assert(pressedOpacity == null || (pressedOpacity >= 0.0 && pressedOpacity <= 1.0)),
+  })  : assert(pressedOpacity == null ||
+            (pressedOpacity >= 0.0 && pressedOpacity <= 1.0)),
         super(key: key);
 
   /// 内容
@@ -54,7 +55,8 @@ class _KeyboardButtonState extends State<KeyboardButton> {
   Widget build(BuildContext context) {
     final bool enabled = widget.enabled;
     final Color backgroundColor = enabled ? widget.color : widget.disabledColor;
-    final Color textColor = enabled ? widget.textColor : widget.textColor.withAlpha(0x99);
+    final Color textColor =
+        enabled ? widget.textColor : widget.textColor.withAlpha(0x99);
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTapDown: enabled ? _handleTapDown : null,

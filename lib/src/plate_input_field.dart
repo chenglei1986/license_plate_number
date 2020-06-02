@@ -11,7 +11,8 @@ class PlateInputField extends StatefulWidget {
     this.keyboardController,
     this.onChanged,
   })  : assert(placeHolder != null, 'plateNumber must be non-null.'),
-        assert(placeHolder.length <= 7, 'plateNumber\'s length should be less than 7.');
+        assert(placeHolder.length <= 7,
+            'plateNumber\'s length should be less than 7.');
 
   /// 车牌号
   final String placeHolder;
@@ -38,7 +39,8 @@ class PlateInputField extends StatefulWidget {
   _PlateInputFieldState createState() => _PlateInputFieldState();
 }
 
-class _PlateInputFieldState extends State<PlateInputField> with SingleTickerProviderStateMixin {
+class _PlateInputFieldState extends State<PlateInputField>
+    with SingleTickerProviderStateMixin {
   /// 车牌号码数组
   final List<String> _plateNumbers = ["", "", "", "", "", "", ""];
 
@@ -138,7 +140,9 @@ class _PlateInputFieldState extends State<PlateInputField> with SingleTickerProv
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: widget.styles.plateInputFieldColor,
-        border: focused ? widget.styles.plateInputFocusedBorder : widget.styles.plateInputBorder,
+        border: focused
+            ? widget.styles.plateInputFocusedBorder
+            : widget.styles.plateInputBorder,
         borderRadius: widget.styles.plateInputBorderRadius,
       ),
       child: text,
@@ -198,7 +202,8 @@ class KeyboardController {
 
   set cursorIndex(int cursorIndex) => _cursorIndex = cursorIndex;
 
-  set animationController(AnimationController controller) => _controller = controller;
+  set animationController(AnimationController controller) =>
+      _controller = controller;
 
   set styles(PlateStyles styles) => _styles = styles;
 

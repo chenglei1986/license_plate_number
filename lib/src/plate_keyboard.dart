@@ -81,25 +81,30 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
     List<Widget> keys = [];
     if (0 == _index) {
       /// 省份
-      provinces.forEach((element) => keys.add(_buildKeyboardButton(element, 0 == _index)));
+      provinces.forEach(
+          (element) => keys.add(_buildKeyboardButton(element, 0 == _index)));
     } else {
       /// 数字
-      numbers.forEach((element) => keys.add(_buildKeyboardButton(element, _index > 1)));
+      numbers.forEach(
+          (element) => keys.add(_buildKeyboardButton(element, _index > 1)));
 
       /// 字母 Q ~ P
-      alphabets[0].forEach((element) => keys.add(_buildKeyboardButton(element, _index > 0)));
+      alphabets[0].forEach(
+          (element) => keys.add(_buildKeyboardButton(element, _index > 0)));
 
       /// 领
       keys.add(_buildKeyboardButton(specials[0], _index >= 6));
 
       /// 字母 A ~ L
-      alphabets[1].forEach((element) => keys.add(_buildKeyboardButton(element, _index > 0)));
+      alphabets[1].forEach(
+          (element) => keys.add(_buildKeyboardButton(element, _index > 0)));
 
       /// 警
       keys.add(_buildKeyboardButton(specials[1], _index >= 6));
 
       /// 字母 Z ~ M
-      alphabets[2].forEach((element) => keys.add(_buildKeyboardButton(element, _index > 0)));
+      alphabets[2].forEach(
+          (element) => keys.add(_buildKeyboardButton(element, _index > 0)));
 
       /// 港
       keys.add(_buildKeyboardButton(specials[2], _index >= 6));
@@ -134,7 +139,8 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
   Widget _buildBackspace() {
     return KeyboardButton(
       child: Image(
-        image: AssetImage('images/backspace.png', package: 'license_plate_number'),
+        image:
+            AssetImage('images/backspace.png', package: 'license_plate_number'),
         width: 20,
         height: 20,
         color: widget.styles.keyboardButtonTextColor,

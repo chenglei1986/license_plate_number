@@ -63,7 +63,8 @@ class PlateStyles {
   ));
 
   /// 黑暗风格输入框获取焦点时的边框
-  static const Border plateInputFocusedBorderDark = Border.fromBorderSide(BorderSide(
+  static const Border plateInputFocusedBorderDark =
+      Border.fromBorderSide(BorderSide(
     color: Color(0xFF2196F3),
     width: 2,
     style: BorderStyle.solid,
@@ -102,7 +103,8 @@ class PlateStyles {
   ));
 
   /// 明亮风格输入框获取焦点时的边框
-  static const Border plateInputFocusedBorderLight = Border.fromBorderSide(BorderSide(
+  static const Border plateInputFocusedBorderLight =
+      Border.fromBorderSide(BorderSide(
     color: Color(0xFF2196F3),
     width: 2,
     style: BorderStyle.solid,
@@ -164,16 +166,22 @@ class PlateStyles {
     Color keyboardButtonDisabledColor,
   }) {
     return PlateStyles(
-      plateInputFieldTextStyle: plateInputFieldTextStyle ?? this.plateInputFieldTextStyle,
+      plateInputFieldTextStyle:
+          plateInputFieldTextStyle ?? this.plateInputFieldTextStyle,
       plateInputFieldColor: plateInputFieldColor ?? this.plateInputFieldColor,
       plateInputBorder: plateInputBorder ?? this.plateInputBorder,
-      plateInputFocusedBorder: plateInputFocusedBorder ?? this.plateInputFocusedBorder,
-      plateInputBorderRadius: plateInputBorderRadius ?? this.plateInputBorderRadius,
+      plateInputFocusedBorder:
+          plateInputFocusedBorder ?? this.plateInputFocusedBorder,
+      plateInputBorderRadius:
+          plateInputBorderRadius ?? this.plateInputBorderRadius,
       plateSeparatorColor: plateSeparatorColor ?? this.plateSeparatorColor,
-      keyboardBackgroundColor: keyboardBackgroundColor ?? this.keyboardBackgroundColor,
-      keyboardButtonTextColor: keyboardButtonTextColor ?? this.keyboardButtonTextColor,
+      keyboardBackgroundColor:
+          keyboardBackgroundColor ?? this.keyboardBackgroundColor,
+      keyboardButtonTextColor:
+          keyboardButtonTextColor ?? this.keyboardButtonTextColor,
       keyboardButtonColor: keyboardButtonColor ?? this.keyboardButtonColor,
-      keyboardButtonDisabledColor: keyboardButtonDisabledColor ?? this.keyboardButtonDisabledColor,
+      keyboardButtonDisabledColor:
+          keyboardButtonDisabledColor ?? this.keyboardButtonDisabledColor,
     );
   }
 }
