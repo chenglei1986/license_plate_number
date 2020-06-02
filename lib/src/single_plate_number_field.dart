@@ -7,9 +7,8 @@ class SinglePlateNumberField {
     this.text, {
     this.textStyle,
     this.decoration,
-  }) : assert(text != null, 'Plate number must be a non-null String.'),
-        assert(text.length < 2,
-            'SinglePlateNumberField can only accept single character as its content');
+  })  : assert(text != null, 'Plate number must be a non-null String.'),
+        assert(text.length < 2, 'SinglePlateNumberField can only accept single character as its content');
 
   /// 车牌号单个字符
   final String text;

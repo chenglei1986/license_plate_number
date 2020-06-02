@@ -85,21 +85,29 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
     } else {
       /// 数字
       numbers.forEach((element) => keys.add(_buildKeyboardButton(element, _index > 1)));
+
       /// 字母 Q ~ P
       alphabets[0].forEach((element) => keys.add(_buildKeyboardButton(element, _index > 0)));
+
       /// 领
       keys.add(_buildKeyboardButton(specials[0], _index >= 6));
+
       /// 字母 A ~ L
       alphabets[1].forEach((element) => keys.add(_buildKeyboardButton(element, _index > 0)));
+
       /// 警
       keys.add(_buildKeyboardButton(specials[1], _index >= 6));
+
       /// 字母 Z ~ M
       alphabets[2].forEach((element) => keys.add(_buildKeyboardButton(element, _index > 0)));
+
       /// 港
       keys.add(_buildKeyboardButton(specials[2], _index >= 6));
+
       /// 澳
       keys.add(_buildKeyboardButton(specials[3], _index >= 6));
     }
+
     /// 退格
     keys.add(_buildBackspace());
     return keys;
@@ -111,13 +119,15 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
       color: widget.styles.keyboardButtonColor,
       textColor: widget.styles.keyboardButtonTextColor,
       disabledColor: widget.styles.keyboardButtonDisabledColor,
-      onPressed: enable ? () {
-        if (_index <= 6) {
-          widget.onChange(_index, data);
-          _index++;
-          setState(() {});
-        }
-      } : null,
+      onPressed: enable
+          ? () {
+              if (_index <= 6) {
+                widget.onChange(_index, data);
+                _index++;
+                setState(() {});
+              }
+            }
+          : null,
     );
   }
 
@@ -140,5 +150,4 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
       },
     );
   }
-
 }

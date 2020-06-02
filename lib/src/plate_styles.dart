@@ -169,7 +169,7 @@ class PlateStyles {
       plateInputBorder: plateInputBorder ?? this.plateInputBorder,
       plateInputFocusedBorder: plateInputFocusedBorder ?? this.plateInputFocusedBorder,
       plateInputBorderRadius: plateInputBorderRadius ?? this.plateInputBorderRadius,
-      plateSeparatorColor : plateSeparatorColor ?? this.plateSeparatorColor,
+      plateSeparatorColor: plateSeparatorColor ?? this.plateSeparatorColor,
       keyboardBackgroundColor: keyboardBackgroundColor ?? this.keyboardBackgroundColor,
       keyboardButtonTextColor: keyboardButtonTextColor ?? this.keyboardButtonTextColor,
       keyboardButtonColor: keyboardButtonColor ?? this.keyboardButtonColor,

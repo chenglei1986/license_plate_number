@@ -138,9 +138,7 @@ class _PlateInputFieldState extends State<PlateInputField> with SingleTickerProv
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: widget.styles.plateInputFieldColor,
-        border: focused
-            ? widget.styles.plateInputFocusedBorder
-            : widget.styles.plateInputBorder,
+        border: focused ? widget.styles.plateInputFocusedBorder : widget.styles.plateInputBorder,
         borderRadius: widget.styles.plateInputBorderRadius,
       ),
       child: text,
@@ -174,7 +172,6 @@ class _PlateInputFieldState extends State<PlateInputField> with SingleTickerProv
 
 /// 键盘控制器
 class KeyboardController {
-
   KeyboardController();
 
   /// 车牌号码数组
@@ -201,12 +198,12 @@ class KeyboardController {
 
   set cursorIndex(int cursorIndex) => _cursorIndex = cursorIndex;
 
-  set animationController(AnimationController controller)  => _controller = controller;
+  set animationController(AnimationController controller) => _controller = controller;
 
   set styles(PlateStyles styles) => _styles = styles;
 
-  set onPlateNumberChanged(onPlateNumberChanged(int index, String value) ) => _onPlateNumberChanged = onPlateNumberChanged;
-
+  set onPlateNumberChanged(onPlateNumberChanged(int index, String value)) =>
+      _onPlateNumberChanged = onPlateNumberChanged;
 
   /// 显示键盘
   void showKeyboard(BuildContext context) {
