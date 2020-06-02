@@ -1,7 +1,7 @@
 name: license_plate_number
 description: Flutter 车牌号输入组件，包含一个输入框和一个键盘。支持自定义主题，自带黑暗和明亮两个默认主题。支持横屏展示。
 version: 1.0.0
-homepage:
+homepage: https://github.com/chenglei1986/license_plate_number
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
