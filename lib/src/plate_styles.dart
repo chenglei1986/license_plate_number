@@ -4,10 +4,11 @@ import 'package:flutter/widgets.dart';
 class PlateStyles {
   const PlateStyles({
     this.plateInputFieldTextStyle = plateInputFieldTextStyleLight,
+    this.newEnergyPlaceHolderTextStyle = newEnergyPlaceHolderTextStyleDark,
     this.plateInputFieldColor = plateInputFieldColorLight,
     this.plateInputBorder = plateInputBorderLight,
     this.plateInputFocusedBorder = plateInputFocusedBorderLight,
-    this.plateInputBorderRadius = const BorderRadius.all(Radius.circular(8.0)),
+    this.plateInputBorderRadius = const Radius.circular(8.0),
     this.plateSeparatorColor = plateSeparatorColorLight,
     this.keyboardBackgroundColor = keyboardBackgroundColorLight,
     this.keyboardButtonTextColor = keyboardButtonTextColorLight,
@@ -17,6 +18,9 @@ class PlateStyles {
 
   /// 车牌号字体样式
   final TextStyle plateInputFieldTextStyle;
+
+  /// 新能源输入框占位字符样式
+  final TextStyle newEnergyPlaceHolderTextStyle;
 
   /// 输入框背景
   final Color plateInputFieldColor;
@@ -28,7 +32,7 @@ class PlateStyles {
   final Border plateInputFocusedBorder;
 
   /// 输入框边框圆角半径
-  final BorderRadius plateInputBorderRadius;
+  final Radius plateInputBorderRadius;
 
   /// 省市与号码之间分隔符的颜色
   final Color plateSeparatorColor;
@@ -49,6 +53,13 @@ class PlateStyles {
   static const TextStyle plateInputFieldTextStyleDark = TextStyle(
     color: Color(0xFFFFFFFF),
     fontSize: 20,
+    fontWeight: FontWeight.normal,
+  );
+
+  /// 黑暗风格车牌号字体样式
+  static const TextStyle newEnergyPlaceHolderTextStyleDark = TextStyle(
+    color: Color(0xFFDDDDDD),
+    fontSize: 10,
     fontWeight: FontWeight.normal,
   );
 
@@ -92,6 +103,13 @@ class PlateStyles {
     fontWeight: FontWeight.normal,
   );
 
+  /// 明亮风格车牌号字体样式
+  static const TextStyle newEnergyPlaceHolderTextStyleLight = TextStyle(
+    color: Color(0xFF666666),
+    fontSize: 10,
+    fontWeight: FontWeight.normal,
+  );
+
   /// 明亮风格输入框背景色
   static const Color plateInputFieldColorLight = Color(0xFFFFFFFF);
 
@@ -128,10 +146,11 @@ class PlateStyles {
   /// 黑暗风格
   static const PlateStyles dark = const PlateStyles(
     plateInputFieldTextStyle: plateInputFieldTextStyleDark,
+    newEnergyPlaceHolderTextStyle: newEnergyPlaceHolderTextStyleDark,
     plateInputFieldColor: plateInputFieldColorDark,
     plateInputBorder: plateInputBorderDark,
     plateInputFocusedBorder: plateInputFocusedBorderDark,
-    plateInputBorderRadius: const BorderRadius.all(Radius.circular(8.0)),
+    plateInputBorderRadius: const Radius.circular(8.0),
     plateSeparatorColor: plateSeparatorColorDark,
     keyboardBackgroundColor: keyboardBackgroundColorDark,
     keyboardButtonTextColor: keyboardButtonTextColorDark,
@@ -142,10 +161,11 @@ class PlateStyles {
   /// 明亮风格
   static const PlateStyles light = const PlateStyles(
     plateInputFieldTextStyle: plateInputFieldTextStyleLight,
+    newEnergyPlaceHolderTextStyle: newEnergyPlaceHolderTextStyleLight,
     plateInputFieldColor: plateInputFieldColorLight,
     plateInputBorder: plateInputBorderLight,
     plateInputFocusedBorder: plateInputFocusedBorderLight,
-    plateInputBorderRadius: const BorderRadius.all(Radius.circular(8.0)),
+    plateInputBorderRadius: const Radius.circular(8.0),
     plateSeparatorColor: plateSeparatorColorLight,
     keyboardBackgroundColor: keyboardBackgroundColorLight,
     keyboardButtonTextColor: keyboardButtonTextColorLight,
@@ -155,6 +175,7 @@ class PlateStyles {
 
   PlateStyles copyWith({
     TextStyle plateInputFieldTextStyle,
+    TextStyle newEnergyPlaceHolderTextStyle,
     Color plateInputFieldColor,
     Border plateInputBorder,
     Border plateInputFocusedBorder,
@@ -168,6 +189,8 @@ class PlateStyles {
     return PlateStyles(
       plateInputFieldTextStyle:
           plateInputFieldTextStyle ?? this.plateInputFieldTextStyle,
+      newEnergyPlaceHolderTextStyle:
+          newEnergyPlaceHolderTextStyle ?? this.newEnergyPlaceHolderTextStyle,
       plateInputFieldColor: plateInputFieldColor ?? this.plateInputFieldColor,
       plateInputBorder: plateInputBorder ?? this.plateInputBorder,
       plateInputFocusedBorder:

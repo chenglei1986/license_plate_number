@@ -10,9 +10,9 @@ Flutter package for inputting chinese license plate number.
 - Supporting landscape.
 - Plate numbers can be edited separately.
 
-![](screenshots/screen_shot_portrait.png)
+![](screenshots/screenshot_portrait.png)
 
-![](screenshots/screenshot_landscape_light.png)
+![](screenshots/screenshot_landscape.png)
 
 
 
@@ -22,7 +22,7 @@ Flutter package for inputting chinese license plate number.
 
 ```yaml
 dependencies:
-  license_plate_number: ^1.0.2
+  license_plate_number: ^1.0.3
 ```
 
 ### Basic usage
@@ -40,8 +40,8 @@ Container(
     inputFieldHeight: 54,
     onChange: (List<String> array, String value) {
       // e.g.
-      // array ['沪', 'A', '1', '2', '3', '4', '5']
-      // value 沪A12345
+      // array ['沪', 'A', '1', '2', '3', '4', '5', '6']
+      // value 沪A123456
     },
   );
   alignment: Alignment.center,
@@ -85,6 +85,12 @@ PlateStyles(
     fontSize: 20,
     fontWeight: FontWeight.normal,
   ),
+  /// Text style of new energy place holder.
+  newEnergyPlaceHolderTextStyle: TextStyle(
+    color: Color(0xFFDDDDDD),
+    fontSize: 10,
+    fontWeight: FontWeight.normal,
+  ),
   /// Background color of input field.
   plateInputFieldColor: Color(0xFF4A4A4A),
   /// Border of input field.
@@ -100,7 +106,7 @@ PlateStyles(
     style: BorderStyle.solid,
   )),
   /// Border radius of input field.
-  plateInputBorderRadius: const BorderRadius.all(Radius.circular(8.0)),
+  plateInputBorderRadius: const Radius.circular(8.0),
   /// Color of Separator between city code and numbers.
   plateSeparatorColor: Color(0xFFFFFFFF),
   

@@ -84,6 +84,7 @@ const alphabets = [
 ];
 
 const specials = [
+  '学',
   '领',
   '警',
   '港',

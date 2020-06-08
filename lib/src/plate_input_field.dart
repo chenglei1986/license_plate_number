@@ -1,3 +1,4 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/widgets.dart';
 import 'package:license_plate_number/license_plate_number.dart';
 import 'package:license_plate_number/src/plate_keyboard.dart';
@@ -11,8 +12,8 @@ class PlateInputField extends StatefulWidget {
     this.keyboardController,
     this.onChanged,
   })  : assert(placeHolder != null, 'plateNumber must be non-null.'),
-        assert(placeHolder.length <= 7,
-            'plateNumber\'s length should be less than 7.');
+        assert(placeHolder.length <= 8,
+            'plateNumber\'s length should be less than 8.');
 
   /// 车牌号
   final String placeHolder;
@@ -42,7 +43,7 @@ class PlateInputField extends StatefulWidget {
 class _PlateInputFieldState extends State<PlateInputField>
     with SingleTickerProviderStateMixin {
   /// 车牌号码数组
-  final List<String> _plateNumbers = ["", "", "", "", "", "", ""];
+  final List<String> _plateNumbers = ["", "", "", "", "", "", "", ""];
 
   /// 当前光标位置
   int _cursorIndex = 0;
@@ -84,7 +85,10 @@ class _PlateInputFieldState extends State<PlateInputField>
   void onPlateNumberChanged(int index, String value) {
     _plateNumbers[index] = value;
     if (value.isNotEmpty) {
-      _cursorIndex = index < 6 ? index + 1 : 6;
+      _cursorIndex = index < 7 ? index + 1 : 7;
+      if (index >= 7 && _cursorIndex >= 7) {
+        _keyboardController.hideKeyboard();
+      }
     } else if (value.isEmpty) {
       _cursorIndex = index > 0 ? index - 1 : 0;
     }
@@ -92,9 +96,6 @@ class _PlateInputFieldState extends State<PlateInputField>
       widget.onChanged(_plateNumbers, _plateNumbers.join());
     }
     setState(() {});
-    if (index >= 6 && _cursorIndex == 6) {
-      _keyboardController.hideKeyboard();
-    }
   }
 
   @override
@@ -130,27 +131,41 @@ class _PlateInputFieldState extends State<PlateInputField>
 
   Widget _buildSingleField(String data, int index) {
     bool focused = _cursorIndex == index;
+    bool newEnergy = index == 7;
+    Border border = focused
+        ? widget.styles.plateInputFocusedBorder
+        : widget.styles.plateInputBorder;
     var text = Text(
-      data,
-      style: widget.styles.plateInputFieldTextStyle,
+      data.isEmpty && newEnergy ? '新能源' : data,
+      style: newEnergy && data.isEmpty
+          ? widget.styles.newEnergyPlaceHolderTextStyle
+          : widget.styles.plateInputFieldTextStyle,
     );
     var container = Container(
       width: widget.inputFieldWidth,
       height: widget.inputFieldHeight,
       alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: widget.styles.plateInputFieldColor,
-        border: focused
-            ? widget.styles.plateInputFocusedBorder
-            : widget.styles.plateInputBorder,
-        borderRadius: widget.styles.plateInputBorderRadius,
-      ),
+      decoration: newEnergy
+          ? null
+          : BoxDecoration(
+              color: widget.styles.plateInputFieldColor,
+              border: border,
+              borderRadius:
+                  BorderRadius.all(widget.styles.plateInputBorderRadius),
+            ),
       child: text,
+    );
+    var newEnergyField = DottedBorder(
+      child: container,
+      color: Color(0xFF666666),
+      borderType: BorderType.RRect,
+      radius: widget.styles.plateInputBorderRadius,
+      padding: const EdgeInsets.all(0),
     );
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 2),
       child: GestureDetector(
-        child: container,
+        child: newEnergy ? newEnergyField : container,
         onTap: () {
           _cursorIndex = index;
           _keyboardController.cursorIndex = _cursorIndex;
@@ -195,7 +210,6 @@ class KeyboardController {
 
   /// 主题
   PlateStyles _styles;
-
   Function(int index, String value) _onPlateNumberChanged;
 
   set plateNumbers(List<String> plateNumbers) => _plateNumbers = plateNumbers;
@@ -221,6 +235,7 @@ class KeyboardController {
           plateNumbers: _plateNumbers,
           currentIndex: _cursorIndex,
           styles: _styles,
+          newEnergy: _cursorIndex == 7,
           onChange: _onPlateNumberChanged,
           animationController: _controller,
         );

@@ -43,6 +43,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.1.3"
+  dotted_border:
+    dependency: transitive
+    description:
+      name: dotted_border
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.0.5"
   fake_async:
     dependency: transitive
     description:
@@ -66,7 +73,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.0.0"
+    version: "1.0.3"
   matcher:
     dependency: transitive
     description:
@@ -88,6 +95,20 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.7.0"
+  path_drawing:
+    dependency: transitive
+    description:
+      name: path_drawing
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.4.1"
+  path_parsing:
+    dependency: transitive
+    description:
+      name: path_parsing
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.1.4"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -151,3 +172,4 @@ packages:
     version: "2.0.8"
 sdks:
   dart: ">=2.7.0 <3.0.0"
+  flutter: ">=0.3.6 <2.0.0"

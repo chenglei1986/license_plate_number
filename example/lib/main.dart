@@ -11,7 +11,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   Brightness _brightness = Brightness.light;
   PlateStyles _plateStyles = PlateStyles.light;
   KeyboardController _keyboardController = KeyboardController();
@@ -37,6 +36,7 @@ class _MyAppState extends State<MyApp> {
               ],
               onSelected: (action) {
                 switch (action) {
+
                   /// 切换成黑暗主题
                   case 'dark':
                     _plateStyles = PlateStyles.dark;
@@ -59,6 +59,7 @@ class _MyAppState extends State<MyApp> {
           child: Container(
             alignment: Alignment.topCenter,
             padding: EdgeInsets.only(top: 30),
+
             /// 车牌号输入框
             child: PlateInputField(
               styles: _plateStyles,
