@@ -22,7 +22,7 @@ Flutter 车牌号输入组件，包含一个输入框和一个键盘。
 
 ```yaml
 dependencies:
-  license_plate_number: ^1.0.3
+  license_plate_number: ^1.0.4
 ```
 
 ### 基本用法

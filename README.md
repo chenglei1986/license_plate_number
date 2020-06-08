@@ -22,7 +22,7 @@ Flutter package for inputting chinese license plate number.
 
 ```yaml
 dependencies:
-  license_plate_number: ^1.0.3
+  license_plate_number: ^1.0.4
 ```
 
 ### Basic usage

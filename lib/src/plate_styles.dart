@@ -179,7 +179,7 @@ class PlateStyles {
     Color plateInputFieldColor,
     Border plateInputBorder,
     Border plateInputFocusedBorder,
-    BorderRadius plateInputBorderRadius,
+    Radius plateInputBorderRadius,
     Color plateSeparatorColor,
     Color keyboardBackgroundColor,
     Color keyboardButtonTextColor,
