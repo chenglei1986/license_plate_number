@@ -13,3 +13,7 @@
 ## 1.0.4
 
 - Fix a bug.
+
+## 1.0.5
+
+- Add complete button.

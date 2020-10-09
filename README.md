@@ -10,9 +10,9 @@ Flutter package for inputting chinese license plate number.
 - Supporting landscape.
 - Plate numbers can be edited separately.
 
-![](screenshots/screenshot_portrait.png)
+![](screenshots/screenshot_portrait.jpeg)
 
-![](screenshots/screenshot_landscape.png)
+![](screenshots/screenshot_landscape.jpeg)
 
 
 
@@ -22,7 +22,7 @@ Flutter package for inputting chinese license plate number.
 
 ```yaml
 dependencies:
-  license_plate_number: ^1.0.4
+  license_plate_number: ^1.1.0
 ```
 
 ### Basic usage

@@ -76,10 +76,11 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
-                    width: 1,
+                    width: 0,
                     color: widget.styles.keyboardBackgroundColor,
                   ),
                 ),
+                color: widget.styles.keyboardButtonColor,
               ),
             ),
             Container(

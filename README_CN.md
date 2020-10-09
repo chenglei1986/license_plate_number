@@ -11,9 +11,9 @@ Flutter 车牌号输入组件，包含一个输入框和一个键盘。
 - 内部处理了 Android 返回键的监听，点击返回键隐藏键盘
 - 车牌号可选中单个号码进行修改
 
-![](screenshots/screenshot_portrait.png)
+![](screenshots/screenshot_portrait.jpeg)
 
-![](screenshots/screenshot_landscape.png)
+![](screenshots/screenshot_landscape.jpeg)
 
 
 ## 使用说明
@@ -22,7 +22,7 @@ Flutter 车牌号输入组件，包含一个输入框和一个键盘。
 
 ```yaml
 dependencies:
-  license_plate_number: ^1.0.4
+  license_plate_number: ^1.1.0
 ```
 
 ### 基本用法

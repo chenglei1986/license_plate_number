@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:license_plate_number/license_plate_number.dart';
 
 void main() {
@@ -87,6 +88,11 @@ class MyHomePage extends StatelessWidget {
     double screenHeight = mediaQuery.size.height;
     double inputFieldWidth = min(screenWidth, screenHeight) / 10;
     double inputFieldHeight = inputFieldWidth * 4 / 3;
+    if (screenWidth < screenHeight) {
+      SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top, SystemUiOverlay.bottom]);
+    } else {
+      SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
+    }
     return Container(
       alignment: Alignment.topCenter,
       padding: EdgeInsets.only(top: 30),
