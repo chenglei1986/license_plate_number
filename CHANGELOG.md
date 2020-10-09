@@ -14,6 +14,6 @@
 
 - Fix a bug.
 
-## 1.0.5
+## 1.1.0
 
 - Add complete button.
