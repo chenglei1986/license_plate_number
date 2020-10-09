@@ -1,6 +1,6 @@
 name: license_plate_number
 description: Flutter widget for inputting license plate number. Build-in one light style and one dark style, and the style can be changed.
-version: 1.0.4
+version: 1.1.0
 homepage: https://github.com/chenglei1986/license_plate_number
 
 environment:

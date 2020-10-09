@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:license_plate_number/license_plate_number.dart';
 
@@ -13,7 +14,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   Brightness _brightness = Brightness.light;
   PlateStyles _plateStyles = PlateStyles.light;
-  KeyboardController _keyboardController = KeyboardController();
+  final KeyboardController _keyboardController = KeyboardController();
 
   @override
   Widget build(BuildContext context) {
@@ -56,25 +57,52 @@ class _MyAppState extends State<MyApp> {
         ),
         body: GestureDetector(
           behavior: HitTestBehavior.translucent,
-          child: Container(
-            alignment: Alignment.topCenter,
-            padding: EdgeInsets.only(top: 30),
-
-            /// 车牌号输入框
-            child: PlateInputField(
-              styles: _plateStyles,
-              keyboardController: _keyboardController,
-              onChanged: (List<String> array, String value) {
-                debugPrint(array.toString());
-                debugPrint(value);
-              },
-            ),
+          child: MyHomePage(
+            plateStyles: _plateStyles,
+            keyboardController: _keyboardController,
           ),
           onTap: () {
             /// 点击键盘外区域收起键盘
             _keyboardController.hideKeyboard();
           },
         ),
+      ),
+    );
+  }
+}
+
+class MyHomePage extends StatelessWidget {
+  MyHomePage({
+    this.plateStyles,
+    this.keyboardController,
+  });
+
+  final PlateStyles plateStyles;
+  final KeyboardController keyboardController;
+
+  @override
+  Widget build(BuildContext context) {
+    MediaQueryData mediaQuery = MediaQuery.of(context);
+    double screenWidth = mediaQuery.size.width;
+    double screenHeight = mediaQuery.size.height;
+    double inputFieldWidth = min(screenWidth, screenHeight) / 10;
+    double inputFieldHeight = inputFieldWidth * 4 / 3;
+    return Container(
+      alignment: Alignment.topCenter,
+      padding: EdgeInsets.only(top: 30),
+
+      /// 车牌号输入框
+      child: PlateInputField(
+        styles: plateStyles,
+        inputFieldWidth: inputFieldWidth,
+        inputFieldHeight: inputFieldHeight,
+        keyboardController: keyboardController,
+        plateSeparatorPadding: 8,
+        plateSeparatorSize: 6,
+        onChanged: (List<String> array, String value) {
+          debugPrint(array.toString());
+          debugPrint(value);
+        },
       ),
     );
   }

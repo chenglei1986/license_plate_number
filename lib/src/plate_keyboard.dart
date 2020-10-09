@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:license_plate_number/license_plate_number.dart';
 import 'package:license_plate_number/src/constants.dart';
@@ -14,6 +15,7 @@ class PlateKeyboard extends StatefulWidget {
     this.newEnergy,
     this.onChange,
     this.animationController,
+    this.onComplete,
   });
 
   final List<String> plateNumbers;
@@ -22,6 +24,7 @@ class PlateKeyboard extends StatefulWidget {
   final bool newEnergy;
   final PlateNumberChanged onChange;
   final AnimationController animationController;
+  final VoidCallback onComplete;
 
   @override
   _PlateKeyboardState createState() => _PlateKeyboardState();
@@ -56,6 +59,29 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
       child: SafeArea(
         child: Column(
           children: [
+            Container(
+              alignment: Alignment.centerRight,
+              child: GestureDetector(
+                child: Text(
+                  '完成',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF2196F3),
+                    decoration: TextDecoration.none,
+                  ),
+                ),
+                onTap: () => widget.onComplete?.call(),
+              ),
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    width: 1,
+                    color: widget.styles.keyboardBackgroundColor,
+                  ),
+                ),
+              ),
+            ),
             Container(
               color: widget.styles.keyboardBackgroundColor,
               padding: EdgeInsets.all(10),

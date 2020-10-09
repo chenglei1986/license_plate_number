@@ -9,6 +9,8 @@ class PlateInputField extends StatefulWidget {
     this.styles = PlateStyles.dark,
     this.inputFieldWidth = 40,
     this.inputFieldHeight = 54,
+    this.plateSeparatorSize = 6,
+    this.plateSeparatorPadding = 8,
     this.keyboardController,
     this.onChanged,
   })  : assert(placeHolder != null, 'plateNumber must be non-null.'),
@@ -26,6 +28,12 @@ class PlateInputField extends StatefulWidget {
 
   /// 输入框高度
   final double inputFieldHeight;
+
+  /// 分隔符大小
+  final double plateSeparatorSize;
+
+  /// 分隔符左右间距
+  final double plateSeparatorPadding;
 
   /// 键盘控制器
   final KeyboardController keyboardController;
@@ -132,9 +140,10 @@ class _PlateInputFieldState extends State<PlateInputField>
   Widget _buildSingleField(String data, int index) {
     bool focused = _cursorIndex == index;
     bool newEnergy = index == 7;
-    Border border = focused
+    Border commonBorder = focused
         ? widget.styles.plateInputFocusedBorder
         : widget.styles.plateInputBorder;
+    Border border = newEnergy && !focused ? Border() : commonBorder;
     var text = Text(
       data.isEmpty && newEnergy ? '新能源' : data,
       style: newEnergy && data.isEmpty
@@ -142,17 +151,18 @@ class _PlateInputFieldState extends State<PlateInputField>
           : widget.styles.plateInputFieldTextStyle,
     );
     var container = Container(
-      width: widget.inputFieldWidth,
-      height: widget.inputFieldHeight,
+      width: newEnergy && !focused
+          ? widget.inputFieldWidth - 4
+          : widget.inputFieldWidth,
+      height: newEnergy && !focused
+          ? widget.inputFieldHeight - 4
+          : widget.inputFieldHeight,
       alignment: Alignment.center,
-      decoration: newEnergy
-          ? null
-          : BoxDecoration(
-              color: widget.styles.plateInputFieldColor,
-              border: border,
-              borderRadius:
-                  BorderRadius.all(widget.styles.plateInputBorderRadius),
-            ),
+      decoration: BoxDecoration(
+        color: widget.styles.plateInputFieldColor,
+        border: border,
+        borderRadius: BorderRadius.all(widget.styles.plateInputBorderRadius),
+      ),
       child: text,
     );
     var newEnergyField = DottedBorder(
@@ -160,12 +170,14 @@ class _PlateInputFieldState extends State<PlateInputField>
       color: Color(0xFF666666),
       borderType: BorderType.RRect,
       radius: widget.styles.plateInputBorderRadius,
-      padding: const EdgeInsets.all(0),
+      padding: const EdgeInsets.all(1),
+      strokeWidth: 2,
+      dashPattern: [4, 2],
     );
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 2),
+      padding: EdgeInsets.symmetric(horizontal: newEnergy && !focused ? 3 : 2),
       child: GestureDetector(
-        child: newEnergy ? newEnergyField : container,
+        child: newEnergy && !focused ? newEnergyField : container,
         onTap: () {
           _cursorIndex = index;
           _keyboardController.cursorIndex = _cursorIndex;
@@ -178,13 +190,13 @@ class _PlateInputFieldState extends State<PlateInputField>
 
   Widget _buildSeparator() {
     return Container(
-      width: 8,
-      height: 8,
+      width: widget.plateSeparatorSize,
+      height: widget.plateSeparatorSize,
       decoration: ShapeDecoration(
         shape: CircleBorder(),
         color: widget.styles.plateSeparatorColor,
       ),
-      margin: EdgeInsets.symmetric(horizontal: 4),
+      margin: EdgeInsets.symmetric(horizontal: widget.plateSeparatorPadding),
     );
   }
 }
@@ -238,6 +250,7 @@ class KeyboardController {
           newEnergy: _cursorIndex == 7,
           onChange: _onPlateNumberChanged,
           animationController: _controller,
+          onComplete: () => hideKeyboard(),
         );
       },
     );
