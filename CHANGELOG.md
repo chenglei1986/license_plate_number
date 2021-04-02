@@ -17,3 +17,7 @@
 ## 1.1.0
 
 - Add complete button.
+
+## 2.0.0
+
+- Migrate to null safety.

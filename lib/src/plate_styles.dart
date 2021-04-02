@@ -174,17 +174,17 @@ class PlateStyles {
   );
 
   PlateStyles copyWith({
-    TextStyle plateInputFieldTextStyle,
-    TextStyle newEnergyPlaceHolderTextStyle,
-    Color plateInputFieldColor,
-    Border plateInputBorder,
-    Border plateInputFocusedBorder,
-    Radius plateInputBorderRadius,
-    Color plateSeparatorColor,
-    Color keyboardBackgroundColor,
-    Color keyboardButtonTextColor,
-    Color keyboardButtonColor,
-    Color keyboardButtonDisabledColor,
+    TextStyle? plateInputFieldTextStyle,
+    TextStyle? newEnergyPlaceHolderTextStyle,
+    Color? plateInputFieldColor,
+    Border? plateInputBorder,
+    Border? plateInputFocusedBorder,
+    Radius? plateInputBorderRadius,
+    Color? plateSeparatorColor,
+    Color? keyboardBackgroundColor,
+    Color? keyboardButtonTextColor,
+    Color? keyboardButtonColor,
+    Color? keyboardButtonDisabledColor,
   }) {
     return PlateStyles(
       plateInputFieldTextStyle:

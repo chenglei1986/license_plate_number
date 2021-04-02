@@ -13,8 +13,7 @@ class PlateInputField extends StatefulWidget {
     this.plateSeparatorPadding = 8,
     this.keyboardController,
     this.onChanged,
-  })  : assert(placeHolder != null, 'plateNumber must be non-null.'),
-        assert(placeHolder.length <= 8,
+  })  : assert(placeHolder.length <= 8,
             'plateNumber\'s length should be less than 8.');
 
   /// 车牌号
@@ -36,13 +35,13 @@ class PlateInputField extends StatefulWidget {
   final double plateSeparatorPadding;
 
   /// 键盘控制器
-  final KeyboardController keyboardController;
+  final KeyboardController? keyboardController;
 
   /// 输入变化监听器
   ///
   /// * [array] - 车牌号字符数组
   /// * [value] - 车牌号字符串
-  final void Function(List<String> array, String value) onChanged;
+  final void Function(List<String> array, String value)? onChanged;
 
   @override
   _PlateInputFieldState createState() => _PlateInputFieldState();
@@ -57,10 +56,10 @@ class _PlateInputFieldState extends State<PlateInputField>
   int _cursorIndex = 0;
 
   /// 键盘进入和退出动画控制器
-  AnimationController _controller;
+  AnimationController? _controller;
 
   /// 键盘控制器
-  KeyboardController _keyboardController;
+  KeyboardController? _keyboardController;
 
   @override
   void initState() {
@@ -79,15 +78,15 @@ class _PlateInputFieldState extends State<PlateInputField>
     if (null == _keyboardController) {
       _keyboardController = KeyboardController();
     }
-    _keyboardController.plateNumbers = _plateNumbers;
-    _keyboardController.onPlateNumberChanged = onPlateNumberChanged;
-    _keyboardController.animationController = _controller;
+    _keyboardController!.plateNumbers = _plateNumbers;
+    _keyboardController!.onPlateNumberChanged = onPlateNumberChanged;
+    _keyboardController!.animationController = _controller;
   }
 
   @override
   void dispose() {
     super.dispose();
-    _keyboardController.dispose();
+    _keyboardController!.dispose();
   }
 
   void onPlateNumberChanged(int index, String value) {
@@ -95,29 +94,29 @@ class _PlateInputFieldState extends State<PlateInputField>
     if (value.isNotEmpty) {
       _cursorIndex = index < 7 ? index + 1 : 7;
       if (index >= 7 && _cursorIndex >= 7) {
-        _keyboardController.hideKeyboard();
+        _keyboardController!.hideKeyboard();
       }
     } else if (value.isEmpty) {
       _cursorIndex = index > 0 ? index - 1 : 0;
     }
     if (widget.onChanged != null) {
-      widget.onChanged(_plateNumbers, _plateNumbers.join());
+      widget.onChanged!(_plateNumbers, _plateNumbers.join());
     }
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    _keyboardController.cursorIndex = _cursorIndex;
-    _keyboardController.styles = widget.styles;
+    _keyboardController!.cursorIndex = _cursorIndex;
+    _keyboardController!.styles = widget.styles;
     return WillPopScope(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: _buildInputFields(),
       ),
       onWillPop: () {
-        if (_keyboardController.isKeyboardShowing()) {
-          _keyboardController.hideKeyboard();
+        if (_keyboardController!.isKeyboardShowing()) {
+          _keyboardController!.hideKeyboard();
           return Future.value(false);
         } else {
           return Future.value(true);
@@ -180,8 +179,8 @@ class _PlateInputFieldState extends State<PlateInputField>
         child: newEnergy && !focused ? newEnergyField : container,
         onTap: () {
           _cursorIndex = index;
-          _keyboardController.cursorIndex = _cursorIndex;
-          _keyboardController.showKeyboard(context);
+          _keyboardController!.cursorIndex = _cursorIndex;
+          _keyboardController!.showKeyboard(context);
           setState(() {});
         },
       ),
@@ -206,29 +205,29 @@ class KeyboardController {
   KeyboardController();
 
   /// 车牌号码数组
-  List<String> _plateNumbers;
+  List<String> _plateNumbers = [];
 
   /// 当前光标位置
   int _cursorIndex = 0;
 
   /// 键盘悬浮窗口
-  OverlayEntry _keyboardOverlay;
+  OverlayEntry? _keyboardOverlay;
 
   /// 键盘进入和退出动画控制器
-  AnimationController _controller;
+  AnimationController? _controller;
 
   /// 键盘可见状态
   bool _isKeyboardShowing = false;
 
   /// 主题
-  PlateStyles _styles;
-  Function(int index, String value) _onPlateNumberChanged;
+  PlateStyles _styles = PlateStyles.light;
+  Function(int index, String value)? _onPlateNumberChanged;
 
   set plateNumbers(List<String> plateNumbers) => _plateNumbers = plateNumbers;
 
   set cursorIndex(int cursorIndex) => _cursorIndex = cursorIndex;
 
-  set animationController(AnimationController controller) =>
+  set animationController(AnimationController? controller) =>
       _controller = controller;
 
   set styles(PlateStyles styles) => _styles = styles;
@@ -239,7 +238,7 @@ class KeyboardController {
   /// 显示键盘
   void showKeyboard(BuildContext context) {
     if (_keyboardOverlay != null) {
-      _keyboardOverlay.remove();
+      _keyboardOverlay!.remove();
     }
     _keyboardOverlay = OverlayEntry(
       builder: (context) {
@@ -254,9 +253,9 @@ class KeyboardController {
         );
       },
     );
-    Overlay.of(context).insert(_keyboardOverlay);
+    Overlay.of(context)!.insert(_keyboardOverlay!);
     if (!_isKeyboardShowing) {
-      _controller.forward();
+      _controller!.forward();
       _isKeyboardShowing = true;
     }
   }
@@ -264,7 +263,7 @@ class KeyboardController {
   /// 隐藏键盘
   void hideKeyboard() {
     if (isKeyboardShowing()) {
-      _controller.reverse();
+      _controller!.reverse();
     }
     _isKeyboardShowing = false;
   }
@@ -277,7 +276,7 @@ class KeyboardController {
   /// 移除悬浮窗口
   void dispose() {
     if (_keyboardOverlay != null) {
-      _keyboardOverlay.remove();
+      _keyboardOverlay!.remove();
       _keyboardOverlay = null;
     }
   }

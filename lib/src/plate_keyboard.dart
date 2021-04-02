@@ -9,10 +9,10 @@ typedef PlateNumberChanged = void Function(int index, String value);
 /// 中国车牌号输入键盘
 class PlateKeyboard extends StatefulWidget {
   PlateKeyboard({
-    this.plateNumbers,
-    this.currentIndex,
-    this.styles,
-    this.newEnergy,
+    this.plateNumbers = const [],
+    this.currentIndex = 0,
+    this.styles = PlateStyles.light,
+    this.newEnergy = false,
     this.onChange,
     this.animationController,
     this.onComplete,
@@ -22,17 +22,17 @@ class PlateKeyboard extends StatefulWidget {
   final int currentIndex;
   final PlateStyles styles;
   final bool newEnergy;
-  final PlateNumberChanged onChange;
-  final AnimationController animationController;
-  final VoidCallback onComplete;
+  final PlateNumberChanged? onChange;
+  final AnimationController? animationController;
+  final VoidCallback? onComplete;
 
   @override
   _PlateKeyboardState createState() => _PlateKeyboardState();
 }
 
 class _PlateKeyboardState extends State<PlateKeyboard> {
-  int _index;
-  Animation<Offset> _offsetAnimation;
+  int _index = 0;
+  late Animation<Offset> _offsetAnimation;
 
   @override
   void initState() {
@@ -42,7 +42,7 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
       begin: const Offset(0.0, 1.0),
       end: Offset.zero,
     ).animate(CurvedAnimation(
-      parent: widget.animationController,
+      parent: widget.animationController!,
       curve: Curves.decelerate,
     ));
   }
@@ -167,7 +167,7 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
       onPressed: enable
           ? () {
               if (_index <= 7) {
-                widget.onChange(_index, data);
+                widget.onChange?.call(_index, data);
                 _index++;
                 setState(() {});
               }
@@ -188,7 +188,7 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
       ),
       color: widget.styles.keyboardButtonColor,
       onPressed: () {
-        widget.onChange(_index, '');
+        widget.onChange?.call(_index, '');
         if (_index > 0) {
           _index--;
         }

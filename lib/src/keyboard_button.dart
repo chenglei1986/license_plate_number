@@ -4,17 +4,16 @@ import 'package:license_plate_number/license_plate_number.dart';
 /// 车牌号输入键盘按键
 class KeyboardButton extends StatefulWidget {
   const KeyboardButton({
-    Key key,
-    @required this.child,
+    Key? key,
+    required this.child,
     this.textColor = PlateStyles.keyboardButtonTextColorDark,
     this.textSize = 14,
     this.color = PlateStyles.keyboardButtonColorDark,
     this.pressedOpacity = 0.8,
     this.disabledColor = PlateStyles.keyboardButtonDisabledColorDark,
     this.borderRadius = const BorderRadius.all(Radius.circular(8.0)),
-    @required this.onPressed,
-  })  : assert(pressedOpacity == null ||
-            (pressedOpacity >= 0.0 && pressedOpacity <= 1.0)),
+    required this.onPressed,
+  })  : assert(pressedOpacity >= 0.0 && pressedOpacity <= 1.0),
         super(key: key);
 
   /// 内容
@@ -39,7 +38,7 @@ class KeyboardButton extends StatefulWidget {
   final BorderRadius borderRadius;
 
   /// 按键被按下时的事件响应回调函数
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   /// 按键是否可用
   bool get enabled => onPressed != null;
