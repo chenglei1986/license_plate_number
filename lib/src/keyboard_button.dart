@@ -13,7 +13,7 @@ class KeyboardButton extends StatefulWidget {
     this.disabledColor = PlateStyles.keyboardButtonDisabledColorDark,
     this.borderRadius = const BorderRadius.all(Radius.circular(8.0)),
     required this.onPressed,
-  })  : assert(pressedOpacity >= 0.0 && pressedOpacity <= 1.0),
+  })   : assert(pressedOpacity >= 0.0 && pressedOpacity <= 1.0),
         super(key: key);
 
   /// 内容

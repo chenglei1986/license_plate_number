@@ -22,7 +22,7 @@ Flutter package for inputting chinese license plate number.
 
 ```yaml
 dependencies:
-  license_plate_number: ^2.0.0
+  license_plate_number: ^2.0.1
 ```
 
 ### Basic usage
@@ -62,6 +62,9 @@ _keyboardController.hideKeyboard();
 
 /// Is keyboard showing
 _keyboardController.isKeyboardShowing();
+
+/// Modify plate number
+_keyboardController.plateNumber = 'XXXXXXX';
 ```
 
 ```dart

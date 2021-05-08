@@ -8,9 +8,9 @@ typedef PlateNumberChanged = void Function(int index, String value);
 
 /// 中国车牌号输入键盘
 class PlateKeyboard extends StatefulWidget {
-  PlateKeyboard({
+  const PlateKeyboard({
     this.plateNumbers = const [],
-    this.currentIndex = 0,
+    this.keyboardController,
     this.styles = PlateStyles.light,
     this.newEnergy = false,
     this.onChange,
@@ -19,7 +19,7 @@ class PlateKeyboard extends StatefulWidget {
   });
 
   final List<String> plateNumbers;
-  final int currentIndex;
+  final KeyboardController? keyboardController;
   final PlateStyles styles;
   final bool newEnergy;
   final PlateNumberChanged? onChange;
@@ -31,13 +31,11 @@ class PlateKeyboard extends StatefulWidget {
 }
 
 class _PlateKeyboardState extends State<PlateKeyboard> {
-  int _index = 0;
   late Animation<Offset> _offsetAnimation;
 
   @override
   void initState() {
     super.initState();
-    _index = widget.currentIndex;
     _offsetAnimation = Tween<Offset>(
       begin: const Offset(0.0, 1.0),
       end: Offset.zero,
@@ -49,11 +47,12 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
 
   @override
   Widget build(BuildContext context) {
+    int index = widget.keyboardController!.cursorIndex;
     double childAspectRatio;
     if (MediaQuery.of(context).orientation == Orientation.portrait) {
-      childAspectRatio = 0 == _index ? 3 / 4 : 2 / 3;
+      childAspectRatio = 0 == index ? 3 / 4 : 2 / 3;
     } else {
-      childAspectRatio = 0 == _index ? 2 / 1 : 16 / 9;
+      childAspectRatio = 0 == index ? 2 / 1 : 16 / 9;
     }
     return SlideTransition(
       child: SafeArea(
@@ -88,7 +87,7 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
               padding: EdgeInsets.all(10),
               alignment: Alignment.bottomCenter,
               child: GridView.count(
-                crossAxisCount: 0 == _index ? 9 : 10,
+                crossAxisCount: 0 == index ? 9 : 10,
                 childAspectRatio: childAspectRatio,
                 shrinkWrap: true,
                 mainAxisSpacing: 4,
@@ -107,50 +106,51 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
 
   List<Widget> _buildKeys() {
     List<Widget> keys = [];
-    if (0 == _index) {
+    int index = widget.keyboardController!.cursorIndex;
+    if (0 == index) {
       /// 省份
       provinces.forEach(
-          (element) => keys.add(_buildKeyboardButton(element, 0 == _index)));
+          (element) => keys.add(_buildKeyboardButton(element, 0 == index)));
     } else {
       /// 数字
       numbers.forEach(
-          (element) => keys.add(_buildKeyboardButton(element, _index > 1)));
+          (element) => keys.add(_buildKeyboardButton(element, index > 1)));
 
       /// 字母 Q ~ P
       alphabets[0].forEach((element) {
         if (element != 'O') {
           keys.add(_buildKeyboardButton(element, true));
         } else if ('O' == element) {
-          if (_index < 5) {
+          if (index < 5) {
             keys.add(_buildKeyboardButton(element, true));
-          } else if (5 == _index) {
+          } else if (5 == index) {
             keys.add(_buildKeyboardButton(element, false));
           }
         }
       });
-      if (_index > 5) {
+      if (index > 5) {
         keys.add(_buildKeyboardButton(specials[0], true));
       }
 
       /// 领
-      keys.add(_buildKeyboardButton(specials[1], _index >= 6));
+      keys.add(_buildKeyboardButton(specials[1], index >= 6));
 
       /// 字母 A ~ L
       alphabets[1].forEach(
-          (element) => keys.add(_buildKeyboardButton(element, _index > 0)));
+          (element) => keys.add(_buildKeyboardButton(element, index > 0)));
 
       /// 警
-      keys.add(_buildKeyboardButton(specials[2], _index >= 6));
+      keys.add(_buildKeyboardButton(specials[2], index >= 6));
 
       /// 字母 Z ~ M
       alphabets[2].forEach(
-          (element) => keys.add(_buildKeyboardButton(element, _index > 0)));
+          (element) => keys.add(_buildKeyboardButton(element, index > 0)));
 
       /// 港
-      keys.add(_buildKeyboardButton(specials[3], _index >= 6));
+      keys.add(_buildKeyboardButton(specials[3], index >= 6));
 
       /// 澳
-      keys.add(_buildKeyboardButton(specials[4], _index >= 6));
+      keys.add(_buildKeyboardButton(specials[4], index >= 6));
     }
 
     /// 退格
@@ -166,9 +166,10 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
       disabledColor: widget.styles.keyboardButtonDisabledColor,
       onPressed: enable
           ? () {
-              if (_index <= 7) {
-                widget.onChange?.call(_index, data);
-                _index++;
+              int index = widget.keyboardController!.cursorIndex;
+              if (index <= 7) {
+                widget.onChange?.call(index, data);
+                widget.keyboardController!.cursorIndex++;
                 setState(() {});
               }
             }
@@ -188,9 +189,10 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
       ),
       color: widget.styles.keyboardButtonColor,
       onPressed: () {
-        widget.onChange?.call(_index, '');
-        if (_index > 0) {
-          _index--;
+        int index = widget.keyboardController!.cursorIndex;
+        widget.onChange?.call(index, '');
+        if (index > 0) {
+          widget.keyboardController!.cursorIndex--;
         }
         setState(() {});
       },

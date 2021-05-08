@@ -7,7 +7,7 @@ class SinglePlateNumberField {
     this.text, {
     this.textStyle,
     this.decoration,
-  })  : assert(text.length < 2,
+  }) : assert(text.length < 2,
             'SinglePlateNumberField can only accept single character as its content');
 
   /// 车牌号单个字符

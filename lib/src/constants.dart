@@ -35,7 +35,6 @@ const provinces = [
   '虚',
   '台',
 ];
-
 const numbers = [
   '1',
   '2',
@@ -48,7 +47,6 @@ const numbers = [
   '9',
   '0',
 ];
-
 const alphabets = [
   [
     'Q',
@@ -82,7 +80,6 @@ const alphabets = [
     'M',
   ],
 ];
-
 const specials = [
   '学',
   '领',

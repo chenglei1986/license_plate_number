@@ -22,7 +22,7 @@ Flutter 车牌号输入组件，包含一个输入框和一个键盘。
 
 ```yaml
 dependencies:
-  license_plate_number: ^2.0.0
+  license_plate_number: ^2.0.1
 ```
 
 ### 基本用法
@@ -62,6 +62,9 @@ _keyboardController.hideKeyboard();
 
 /// 判断键盘是否可见
 _keyboardController.isKeyboardShowing();
+
+/// 修改车牌号
+_keyboardController.plateNumber = 'XXXXXXX';
 ```
 
 ```dart

@@ -13,7 +13,7 @@ class PlateInputField extends StatefulWidget {
     this.plateSeparatorPadding = 8,
     this.keyboardController,
     this.onChanged,
-  })  : assert(placeHolder.length <= 8,
+  }) : assert(placeHolder.length <= 8,
             'plateNumber\'s length should be less than 8.');
 
   /// 车牌号
@@ -49,36 +49,28 @@ class PlateInputField extends StatefulWidget {
 
 class _PlateInputFieldState extends State<PlateInputField>
     with SingleTickerProviderStateMixin {
-  /// 车牌号码数组
-  final List<String> _plateNumbers = ["", "", "", "", "", "", "", ""];
-
-  /// 当前光标位置
-  int _cursorIndex = 0;
-
   /// 键盘进入和退出动画控制器
   AnimationController? _controller;
 
   /// 键盘控制器
   KeyboardController? _keyboardController;
+  late ValueNotifier<String> _valueNotifier;
 
   @override
   void initState() {
     super.initState();
     String plateNumber = widget.placeHolder;
-    if (plateNumber.isNotEmpty) {
-      List<String> numbers = plateNumber.split('');
-      _plateNumbers.replaceRange(0, numbers.length, numbers);
-      _cursorIndex = numbers.length;
-    }
     _controller = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
+    _valueNotifier = ValueNotifier(plateNumber);
     _keyboardController = widget.keyboardController;
     if (null == _keyboardController) {
       _keyboardController = KeyboardController();
     }
-    _keyboardController!.plateNumbers = _plateNumbers;
+    _keyboardController!._valueNotifier = _valueNotifier;
+    _keyboardController!.plateNumber = plateNumber;
     _keyboardController!.onPlateNumberChanged = onPlateNumberChanged;
     _keyboardController!.animationController = _controller;
   }
@@ -86,33 +78,41 @@ class _PlateInputFieldState extends State<PlateInputField>
   @override
   void dispose() {
     super.dispose();
+    _valueNotifier.dispose();
     _keyboardController!.dispose();
   }
 
   void onPlateNumberChanged(int index, String value) {
-    _plateNumbers[index] = value;
+    _keyboardController!._plateNumbers[index] = value;
+    _keyboardController!._plateNumber =
+        _keyboardController!._plateNumbers.join();
     if (value.isNotEmpty) {
-      _cursorIndex = index < 7 ? index + 1 : 7;
-      if (index >= 7 && _cursorIndex >= 7) {
+      _keyboardController!._valueNotifier.value =
+          _keyboardController!._plateNumber;
+      if (index >= 7 && _keyboardController!.cursorIndex >= 7) {
         _keyboardController!.hideKeyboard();
       }
     } else if (value.isEmpty) {
-      _cursorIndex = index > 0 ? index - 1 : 0;
+      setState(() {});
     }
     if (widget.onChanged != null) {
-      widget.onChanged!(_plateNumbers, _plateNumbers.join());
+      widget.onChanged!(_keyboardController!._plateNumbers,
+          _keyboardController!._plateNumber);
     }
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    _keyboardController!.cursorIndex = _cursorIndex;
     _keyboardController!.styles = widget.styles;
     return WillPopScope(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: _buildInputFields(),
+      child: ValueListenableBuilder(
+        valueListenable: _valueNotifier,
+        builder: (context, String value, child) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: _buildInputFields(),
+          );
+        },
       ),
       onWillPop: () {
         if (_keyboardController!.isKeyboardShowing()) {
@@ -127,8 +127,8 @@ class _PlateInputFieldState extends State<PlateInputField>
 
   List<Widget> _buildInputFields() {
     List<Widget> children = [];
-    for (int i = 0; i < _plateNumbers.length; i++) {
-      children.add(_buildSingleField(_plateNumbers[i], i));
+    for (int i = 0; i < _keyboardController!._plateNumbers.length; i++) {
+      children.add(_buildSingleField(_keyboardController!._plateNumbers[i], i));
       if (1 == i) {
         children.add(_buildSeparator());
       }
@@ -137,7 +137,7 @@ class _PlateInputFieldState extends State<PlateInputField>
   }
 
   Widget _buildSingleField(String data, int index) {
-    bool focused = _cursorIndex == index;
+    bool focused = _keyboardController!.cursorIndex == index;
     bool newEnergy = index == 7;
     Border commonBorder = focused
         ? widget.styles.plateInputFocusedBorder
@@ -178,8 +178,7 @@ class _PlateInputFieldState extends State<PlateInputField>
       child: GestureDetector(
         child: newEnergy && !focused ? newEnergyField : container,
         onTap: () {
-          _cursorIndex = index;
-          _keyboardController!.cursorIndex = _cursorIndex;
+          _keyboardController!.cursorIndex = index;
           _keyboardController!.showKeyboard(context);
           setState(() {});
         },
@@ -205,10 +204,13 @@ class KeyboardController {
   KeyboardController();
 
   /// 车牌号码数组
-  List<String> _plateNumbers = [];
+  final List<String> _plateNumbers = ['', '', '', '', '', '', '', ''];
+
+  /// 车牌号
+  String _plateNumber = '';
 
   /// 当前光标位置
-  int _cursorIndex = 0;
+  int cursorIndex = 0;
 
   /// 键盘悬浮窗口
   OverlayEntry? _keyboardOverlay;
@@ -221,11 +223,19 @@ class KeyboardController {
 
   /// 主题
   PlateStyles _styles = PlateStyles.light;
+  late ValueNotifier<String> _valueNotifier;
   Function(int index, String value)? _onPlateNumberChanged;
 
-  set plateNumbers(List<String> plateNumbers) => _plateNumbers = plateNumbers;
+  set plateNumber(String plateNumber) {
+    _plateNumber = plateNumber;
+    List<String> numbers = plateNumber.split('');
+    _plateNumbers.fillRange(0, _plateNumbers.length, '');
+    _plateNumbers.replaceRange(0, numbers.length, numbers);
+    cursorIndex = numbers.length;
+    _valueNotifier.value = plateNumber;
+  }
 
-  set cursorIndex(int cursorIndex) => _cursorIndex = cursorIndex;
+  String get plateNumber => _plateNumber;
 
   set animationController(AnimationController? controller) =>
       _controller = controller;
@@ -244,9 +254,9 @@ class KeyboardController {
       builder: (context) {
         return PlateKeyboard(
           plateNumbers: _plateNumbers,
-          currentIndex: _cursorIndex,
+          keyboardController: this,
           styles: _styles,
-          newEnergy: _cursorIndex == 7,
+          newEnergy: cursorIndex == 7,
           onChange: _onPlateNumberChanged,
           animationController: _controller,
           onComplete: () => hideKeyboard(),
