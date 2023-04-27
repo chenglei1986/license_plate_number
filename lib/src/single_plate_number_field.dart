@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/widgets.dart';
 
 /// 车牌号单个字符输入框
