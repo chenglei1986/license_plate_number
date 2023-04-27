@@ -1,7 +1,6 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/widgets.dart';
 import 'package:license_plate_number/license_plate_number.dart';
-import 'package:license_plate_number/src/plate_keyboard.dart';
 
 class PlateInputField extends StatefulWidget {
   const PlateInputField({
@@ -13,6 +12,7 @@ class PlateInputField extends StatefulWidget {
     this.plateSeparatorPadding = 8,
     this.keyboardController,
     this.onChanged,
+    this.onCompleted,
   }) : assert(placeHolder.length <= 8,
             'plateNumber\'s length should be less than 8.');
 
@@ -36,6 +36,12 @@ class PlateInputField extends StatefulWidget {
 
   /// 键盘控制器
   final KeyboardController? keyboardController;
+
+  /// 完成后的回调
+  ///
+  /// * [array] - 车牌号字符数组
+  /// * [value] - 车牌号字符串
+  final void Function(List<String> array, String value)? onCompleted;
 
   /// 输入变化监听器
   ///
@@ -73,6 +79,9 @@ class _PlateInputFieldState extends State<PlateInputField>
     _keyboardController!.plateNumber = plateNumber;
     _keyboardController!.onPlateNumberChanged = onPlateNumberChanged;
     _keyboardController!.animationController = _controller;
+    if (widget.onCompleted != null) {
+      _keyboardController!.onComplete = widget.onCompleted!;
+    }
   }
 
   @override
@@ -225,6 +234,7 @@ class KeyboardController {
   PlateStyles _styles = PlateStyles.light;
   late ValueNotifier<String> _valueNotifier;
   Function(int index, String value)? _onPlateNumberChanged;
+  void Function(List<String> array, String value)? _onCompleted;
 
   set plateNumber(String plateNumber) {
     _plateNumber = plateNumber;
@@ -245,6 +255,9 @@ class KeyboardController {
   set onPlateNumberChanged(onPlateNumberChanged(int index, String value)) =>
       _onPlateNumberChanged = onPlateNumberChanged;
 
+  set onComplete(onComplete(List<String> array, String value)) =>
+      _onCompleted = onComplete;
+
   /// 显示键盘
   void showKeyboard(BuildContext context) {
     if (_keyboardOverlay != null) {
@@ -259,11 +272,16 @@ class KeyboardController {
           newEnergy: cursorIndex == 7,
           onChange: _onPlateNumberChanged,
           animationController: _controller,
-          onComplete: () => hideKeyboard(),
+          onComplete: () {
+            if (_onCompleted != null) {
+              _onCompleted!(_plateNumbers, _plateNumber);
+            }
+            hideKeyboard();
+          },
         );
       },
     );
-    Overlay.of(context)!.insert(_keyboardOverlay!);
+    Overlay.of(context).insert(_keyboardOverlay!);
     if (!_isKeyboardShowing) {
       _controller!.forward();
       _isKeyboardShowing = true;
