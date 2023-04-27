@@ -38,7 +38,6 @@ class _MyAppState extends State<MyApp> {
               ],
               onSelected: (action) {
                 switch (action) {
-
                   /// 切换成黑暗主题
                   case 'dark':
                     _plateStyles = PlateStyles.dark;
@@ -89,7 +88,8 @@ class MyHomePage extends StatelessWidget {
     double inputFieldWidth = min(screenWidth, screenHeight) / 10;
     double inputFieldHeight = inputFieldWidth * 4 / 3;
     if (screenWidth < screenHeight) {
-      SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top, SystemUiOverlay.bottom]);
+      SystemChrome.setEnabledSystemUIOverlays(
+          [SystemUiOverlay.top, SystemUiOverlay.bottom]);
     } else {
       SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
     }
@@ -106,6 +106,12 @@ class MyHomePage extends StatelessWidget {
         plateSeparatorPadding: 8,
         plateSeparatorSize: 6,
         onChanged: (List<String> array, String value) {
+          debugPrint('--- changed ---');
+          debugPrint(array.toString());
+          debugPrint(value);
+        },
+        onCompleted: (List<String> array, String value) {
+          debugPrint('--- completed ---');
           debugPrint(array.toString());
           debugPrint(value);
         },
