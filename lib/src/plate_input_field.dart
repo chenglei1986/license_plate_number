@@ -99,6 +99,9 @@ class _PlateInputFieldState extends State<PlateInputField>
       _keyboardController!._valueNotifier.value =
           _keyboardController!._plateNumber;
       if (index >= 7 && _keyboardController!.cursorIndex >= 7) {
+        // before close the keyboard, call the complete callback
+        widget.onCompleted?.call(_keyboardController!._plateNumbers,
+            _keyboardController!._plateNumber);
         _keyboardController!.hideKeyboard();
       }
     } else if (value.isEmpty) {
