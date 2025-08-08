@@ -56,7 +56,6 @@ const alphabets = [
     'T',
     'Y',
     'U',
-    'O',
     'P',
   ],
   [
@@ -86,4 +85,5 @@ const specials = [
   '警',
   '港',
   '澳',
+  '挂',
 ];
