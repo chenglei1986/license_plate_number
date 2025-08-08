@@ -117,17 +117,8 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
           (element) => keys.add(_buildKeyboardButton(element, index > 1)));
 
       /// 字母 Q ~ P
-      alphabets[0].forEach((element) {
-        if (element != 'O') {
-          keys.add(_buildKeyboardButton(element, true));
-        } else if ('O' == element) {
-          if (index < 5) {
-            keys.add(_buildKeyboardButton(element, true));
-          } else if (5 == index) {
-            keys.add(_buildKeyboardButton(element, false));
-          }
-        }
-      });
+      alphabets[0]
+          .forEach((element) => keys.add(_buildKeyboardButton(element, true)));
       if (index > 5) {
         keys.add(_buildKeyboardButton(specials[0], true));
       }
@@ -151,6 +142,9 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
 
       /// 澳
       keys.add(_buildKeyboardButton(specials[4], index >= 6));
+
+      /// 挂
+      keys.add(_buildKeyboardButton(specials[5], index >= 6));
     }
 
     /// 退格
