@@ -18,11 +18,14 @@
 - Add pubspec topics, issue tracker and screenshots; grow tests to 22 cases.
 - Introduce the `PlatePattern` data model (`PlateSlot` / `KeyPage` / `PlatePatterns`): slot character sets, key pages and separators are now data-driven; the built-in `PlatePatterns.china` reproduces the previous hardcoded behavior and all existing tests pass unchanged.
 - Add `PlatePatterns.korea` (123가4567, hangul key page) and `PlatePatterns.unitedStates` (generic 3+4 lenient mode) to validate the pattern abstraction; `autoCompleteLength` now defaults to the pattern's slot count.
+- Align the built-in patterns with local regulations (verified against MOLIT/KOTI, the Japanese 自動車登録規則/JAF and AAMVA/state DMV sources): Korea now uses the correct private-car hangul set (24 letters ending 구누두루무, replacing the incorrect 버서어저); Japan uses the 42 hiragana actually issued (お・し・へ・ん are never used) and adds the 2018 rule allowing letters A/C/F/H/K/L/M/P/X/Y in the lower two classification-number positions.
 - Support multi-row plate display via `PlatePattern.displayRows` and add `PlatePatterns.japan` (two-row layout) as the validating case; malformed row groupings are rejected with an ArgumentError.
 - Fix the backspace key drifting with the key count: it is now pinned to the bottom-right cell of every key page.
 - Fix the keyboard not refreshing when the pattern or theme changes while it is open.
 - Cap the keyboard height to half the screen and flatten keys automatically, so landscape no longer covers the input field; the new energy placeholder now renders on a single line.
+- Fix a crash when the field's configuration changes (e.g. a theme toggle) while the keyboard overlay is mounted: the controller sync now runs after the frame.
 - Redesign the example app (Material 3, pattern switcher, option switches) and refresh screenshots.
+- Add in-app language switching (zh/en/ko/ja) to the example app and publish bilingual screenshots (Chinese and English UI) for both READMEs.
 - Add `flutter_lints`, CI workflow and widget tests.
 
 ## 2.0.1

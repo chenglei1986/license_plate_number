@@ -109,9 +109,11 @@ abstract final class PlatePatterns {
     slotSeparators: [1],
   );
 
-  /// 韩国车牌（2006 式）：3 位数字 + 谚文字母 + 4 位数字，如 123가4567。
+  /// 韩国车牌（2019 年式）：3 位数字 + 谚文字母 + 4 位数字，如 123가4567。
   ///
-  /// 谚文字母集为乘用车常用 24 个；商用车等类型用字不同，可按需扩展。
+  /// 2019 年 7 月起新发行乘用车采用此 8 位格式；此前 2004 年式的
+  /// 7 位格式（12가3456）旧牌仍并存使用。谚文字母集为自家用乘用车
+  /// 用字（가~무 24 个），营业용等其他用途用字不同，可按需扩展。
   static const PlatePattern korea = PlatePattern(
     code: 'KR',
     name: '韩国车牌',
@@ -171,7 +173,9 @@ abstract final class PlatePatterns {
   /// 日本车牌（两行布局）：上排为地域名（汉字槽位）与 3 位分类号码，
   /// 下排为平假名与 4 位数字，如 品川 500 / さ 1234。
   ///
-  /// 地域汉字集合为常用子集，完整数据需按各地域名补充。
+  /// 分类号码自 2018 年起下 2 位可用罗马字（A/C/F/H/K/L/M/P/X/Y）。
+  /// 地域名集合为常用子集（实际为運輸支局特定地名，宽松近似，
+  /// 生产使用需补全地名数据）。
   static const PlatePattern japan = PlatePattern(
     code: 'JP',
     name: '日本车牌（两行）',
@@ -181,10 +185,10 @@ abstract final class PlatePatterns {
       PlateSlot({...regionKanji}, keyPage: 0),
       PlateSlot({...regionKanji}, keyPage: 0),
       PlateSlot({...numbers}, keyPage: 1),
-      PlateSlot({...numbers}, keyPage: 1),
-      PlateSlot({...numbers}, keyPage: 1),
+      PlateSlot({...numbers, ...classificationLetters}, keyPage: 2),
+      PlateSlot({...numbers, ...classificationLetters}, keyPage: 2),
       // 下排：平假名 + 数字
-      PlateSlot({...hiragana}, keyPage: 2),
+      PlateSlot({...hiragana}, keyPage: 3),
       PlateSlot({...numbers}, keyPage: 1),
       PlateSlot({...numbers}, keyPage: 1),
       PlateSlot({...numbers}, keyPage: 1),
@@ -200,6 +204,12 @@ abstract final class PlatePatterns {
       KeyPage(
         columns: 5,
         keys: numbers,
+        aspectRatioPortrait: 3 / 2,
+        aspectRatioLandscape: 3 / 1,
+      ),
+      KeyPage(
+        columns: 10,
+        keys: [...numbers, ...classificationLetters],
         aspectRatioPortrait: 3 / 2,
         aspectRatioLandscape: 3 / 1,
       ),
