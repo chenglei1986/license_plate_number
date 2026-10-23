@@ -19,6 +19,10 @@
 - Introduce the `PlatePattern` data model (`PlateSlot` / `KeyPage` / `PlatePatterns`): slot character sets, key pages and separators are now data-driven; the built-in `PlatePatterns.china` reproduces the previous hardcoded behavior and all existing tests pass unchanged.
 - Add `PlatePatterns.korea` (123가4567, hangul key page) and `PlatePatterns.unitedStates` (generic 3+4 lenient mode) to validate the pattern abstraction; `autoCompleteLength` now defaults to the pattern's slot count.
 - Support multi-row plate display via `PlatePattern.displayRows` and add `PlatePatterns.japan` (two-row layout) as the validating case; malformed row groupings are rejected with an ArgumentError.
+- Fix the backspace key drifting with the key count: it is now pinned to the bottom-right cell of every key page.
+- Fix the keyboard not refreshing when the pattern or theme changes while it is open.
+- Cap the keyboard height to half the screen and flatten keys automatically, so landscape no longer covers the input field; the new energy placeholder now renders on a single line.
+- Redesign the example app (Material 3, pattern switcher, option switches) and refresh screenshots.
 - Add `flutter_lints`, CI workflow and widget tests.
 
 ## 2.0.1

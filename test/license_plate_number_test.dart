@@ -246,6 +246,29 @@ void main() {
       await tester.pumpAndSettle();
       expect(pressed, ['沪', '']);
     });
+
+    testWidgets('backspace stays at the bottom-right cell of the grid', (
+      tester,
+    ) async {
+      final controller = KeyboardController()..plateNumber = '沪';
+      await tester.pumpWidget(
+        _wrap(PlateKeyboard(keyboardController: controller)),
+      );
+
+      // Alphanumeric page: 41 keys, 1 backspace, padded to 5 rows of 10.
+      final grid = tester.widget<GridView>(find.byType(GridView));
+      final delegate = grid.childrenDelegate as SliverChildListDelegate;
+      expect(delegate.children.length, 50);
+      // The last cell holds the backspace key.
+      final lastCell = delegate.children.last;
+      expect(
+        find.descendant(
+          of: find.byWidget(lastCell),
+          matching: find.byType(Image),
+        ),
+        findsOneWidget,
+      );
+    });
   });
 
   group('PlateInputField', () {
@@ -492,6 +515,29 @@ void main() {
 
       // Slot 7: back to the digit page for the serial number.
       expect(find.text('1'), findsOneWidget);
+    });
+
+    testWidgets('keyboard rebuilds when pattern changes while open', (
+      tester,
+    ) async {
+      final controller = KeyboardController();
+      await tester.pumpWidget(
+        _wrap(PlateInputField(keyboardController: controller)),
+      );
+
+      controller.showKeyboard(tester.element(find.byType(PlateInputField)));
+      await tester.pumpAndSettle();
+      expect(find.text('沪'), findsOneWidget);
+
+      controller.pattern = PlatePatterns.unitedStates;
+      // The refresh is scheduled post-frame; let the frames settle.
+      await tester.pump();
+      await tester.pump();
+      await tester.pump();
+      // The keyboard refreshes to the US layout without closing.
+      expect(find.text('A'), findsOneWidget);
+      expect(find.text('沪'), findsNothing);
+      expect(controller.isKeyboardShowing(), isTrue);
     });
 
     testWidgets('malformed displayRows throws ArgumentError', (tester) async {

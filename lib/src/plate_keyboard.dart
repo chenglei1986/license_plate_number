@@ -63,10 +63,23 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
     final controller = widget.keyboardController!;
     final slot = controller.pattern.slots[controller.cursorIndex];
     final page = controller.pattern.keyPages[slot.keyPage];
-    final childAspectRatio =
-        MediaQuery.of(context).orientation == Orientation.portrait
-            ? page.aspectRatioPortrait
-            : page.aspectRatioLandscape;
+    final mediaQuery = MediaQuery.of(context);
+    final isPortrait = mediaQuery.orientation == Orientation.portrait;
+    var childAspectRatio =
+        isPortrait ? page.aspectRatioPortrait : page.aspectRatioLandscape;
+    // 限制键盘整体高度（不超过屏幕一半），避免横屏矮屏时遮挡输入框：
+    // 超过上限时自动增大按键纵横比（按键压扁），键盘页数据无需关心屏幕尺寸。
+    final rowCount = (page.keys.length + 1 + page.columns - 1) ~/ page.columns;
+    final gridHorizontalPadding = 20 + (page.columns - 1) * 4;
+    final keyWidth =
+        (mediaQuery.size.width - gridHorizontalPadding) / page.columns;
+    final maxGridHeight = mediaQuery.size.height * 0.5 - 64;
+    if (maxGridHeight > 0 && keyWidth > 0) {
+      final maxKeyHeight = maxGridHeight / rowCount;
+      if (keyWidth / childAspectRatio > maxKeyHeight) {
+        childAspectRatio = keyWidth / maxKeyHeight;
+      }
+    }
     final keyboard = SafeArea(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -118,8 +131,16 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
     final keys = <Widget>[
       for (final key in page.keys)
         _buildKeyboardButton(key, slot.chars.contains(key)),
-      _buildBackspace(),
     ];
+    // 退格键固定显示在最后一行右下角，用空位补齐网格
+    final totalCells =
+        ((page.keys.length + 1 + page.columns - 1) ~/ page.columns) *
+        page.columns;
+    final padding = totalCells - page.keys.length - 1;
+    for (var i = 0; i < padding; i++) {
+      keys.add(const SizedBox.shrink());
+    }
+    keys.add(_buildBackspace());
     return keys;
   }
 

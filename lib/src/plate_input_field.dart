@@ -69,7 +69,11 @@ class PlateInputField extends StatefulWidget {
   /// 输入框的无障碍语义标签
   final String semanticsLabel;
 
-  /// 是否开启键盘外（输入框空白区域）点击收起键盘
+  /// 是否开启键盘外（输入框空白区域）点击收起键盘。
+  ///
+  /// 仅覆盖输入框自身范围内的空白区域；如需点击页面任意空白处收起
+  /// 键盘，请在页面层包一层 GestureDetector 调用
+  /// `KeyboardController.hideKeyboard`。
   final bool dismissOnTapOutside;
 
   /// 按下键盘按键时是否触发触感反馈
@@ -111,7 +115,7 @@ class _PlateInputFieldState extends State<PlateInputField>
       vsync: this,
     );
     _keyboardController = widget.keyboardController ?? KeyboardController();
-    _keyboardController.pattern = widget.pattern;
+    _syncControllerConfig();
     if (widget.placeHolder.length > widget.pattern.slots.length) {
       throw ArgumentError.value(
         widget.placeHolder,
@@ -149,6 +153,25 @@ class _PlateInputFieldState extends State<PlateInputField>
   }
 
   @override
+  void didUpdateWidget(PlateInputField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _syncControllerConfig();
+  }
+
+  /// 把 widget 配置同步到控制器（含模式切换时的键盘刷新）。
+  ///
+  /// 只在 initState / didUpdateWidget 中调用，避免在 build 阶段
+  /// 触发悬浮窗口的 markNeedsBuild。
+  void _syncControllerConfig() {
+    _keyboardController
+      ..pattern = widget.pattern
+      ..styles = widget.styles
+      ..completeText = widget.completeText
+      ..enableHapticFeedback = widget.enableHapticFeedback
+      ..onKeyPressed = widget.onKeyPressed;
+  }
+
+  @override
   void dispose() {
     // 先移除键盘悬浮窗口，再释放动画控制器
     _keyboardController.dispose();
@@ -180,12 +203,6 @@ class _PlateInputFieldState extends State<PlateInputField>
 
   @override
   Widget build(BuildContext context) {
-    _keyboardController
-      ..styles = widget.styles
-      ..completeText = widget.completeText
-      ..enableHapticFeedback = widget.enableHapticFeedback
-      ..onKeyPressed = widget.onKeyPressed
-      ..pattern = widget.pattern;
     return ValueListenableBuilder<bool>(
       valueListenable: _keyboardController.keyboardShowing,
       builder: (context, showing, child) {
@@ -266,22 +283,21 @@ class _PlateInputFieldState extends State<PlateInputField>
             ? widget.styles.plateInputFocusedBorder
             : widget.styles.plateInputBorder;
     Border border = hasPlaceholder && !focused ? const Border() : commonBorder;
-    var text = Text(
-      data.isEmpty && hasPlaceholder ? (widget.newEnergyPlaceHolder) : data,
-      style:
-          hasPlaceholder && data.isEmpty
-              ? widget.styles.newEnergyPlaceHolderTextStyle
-              : widget.styles.plateInputFieldTextStyle,
+    var text = FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Text(
+        data.isEmpty && hasPlaceholder ? (widget.newEnergyPlaceHolder) : data,
+        maxLines: 1,
+        softWrap: false,
+        style:
+            hasPlaceholder && data.isEmpty
+                ? widget.styles.newEnergyPlaceHolderTextStyle
+                : widget.styles.plateInputFieldTextStyle,
+      ),
     );
     var container = Container(
-      width:
-          hasPlaceholder && !focused
-              ? widget.inputFieldWidth - 4
-              : widget.inputFieldWidth,
-      height:
-          hasPlaceholder && !focused
-              ? widget.inputFieldHeight - 4
-              : widget.inputFieldHeight,
+      width: widget.inputFieldWidth,
+      height: widget.inputFieldHeight,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: widget.styles.plateInputFieldColor,
@@ -301,9 +317,7 @@ class _PlateInputFieldState extends State<PlateInputField>
       child: container,
     );
     return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: hasPlaceholder && !focused ? 3 : 2,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 2),
       child: GestureDetector(
         child: hasPlaceholder && !focused ? newEnergyField : container,
         onTap: () {
@@ -364,6 +378,7 @@ class KeyboardController {
   PlatePattern get pattern => _pattern;
 
   set pattern(PlatePattern value) {
+    if (identical(_pattern, value)) return;
     _pattern = value;
     if (_plateNumbers.length != value.slots.length) {
       final old = _plateNumbers;
@@ -375,6 +390,8 @@ class KeyboardController {
     cursorIndex = _cursorIndex;
     _plateNumber = _plateNumbers.join();
     valueNotifier.value = _plateNumber;
+    // 键盘展开时切换制式，同步刷新悬浮窗口内的键盘布局
+    _keyboardOverlay?.markNeedsBuild();
   }
 
   /// 车牌号变化通知器
@@ -433,7 +450,12 @@ class KeyboardController {
   set animationController(AnimationController? controller) =>
       _controller = controller;
 
-  set styles(PlateStyles styles) => _styles = styles;
+  set styles(PlateStyles styles) {
+    if (identical(_styles, styles)) return;
+    _styles = styles;
+    // 主题切换时同步刷新悬浮窗口内的键盘样式
+    _keyboardOverlay?.markNeedsBuild();
+  }
 
   set onPlateNumberChanged(
     void Function(int index, String value) onPlateNumberChanged,
