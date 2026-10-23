@@ -11,9 +11,18 @@ Flutter package for inputting chinese license plate number.
 - Plate numbers can be edited separately.
 - Data-driven plate patterns with built-in China, Korea, US and Japan formats.
 
-![](screenshots/screenshot_portrait.png)
+![](screenshots/screenshot_portrait_en.png)
 
-![](screenshots/screenshot_landscape.png)
+![](screenshots/screenshot_landscape_en.png)
+
+### Plate formats
+
+Built-in patterns for China, Korea, the US and Japan. The keyboard layout and
+the allowed characters of every position come from the pattern data.
+
+| Korea | Japan (two rows) | US (dark theme) |
+|---|---|---|
+| ![](screenshots/screenshot_korea_en.png) | ![](screenshots/screenshot_japan_en.png) | ![](screenshots/screenshot_dark_en.png) |
 
 
 

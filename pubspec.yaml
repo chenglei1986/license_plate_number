@@ -11,10 +11,16 @@ topics:
   - chinese
 
 screenshots:
-  - description: 'Portrait'
-    path: screenshots/screenshot_portrait.png
-  - description: 'Landscape'
-    path: screenshots/screenshot_landscape.png
+  - description: 'China plate, portrait'
+    path: screenshots/screenshot_portrait_en.png
+  - description: 'China plate, landscape'
+    path: screenshots/screenshot_landscape_en.png
+  - description: 'Korea plate format'
+    path: screenshots/screenshot_korea_en.png
+  - description: 'Japan plate format, two rows'
+    path: screenshots/screenshot_japan_en.png
+  - description: 'US plate format, dark theme'
+    path: screenshots/screenshot_dark_en.png
 
 environment:
   sdk: ^3.7.2

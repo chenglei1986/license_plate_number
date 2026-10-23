@@ -3,9 +3,15 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:license_plate_number/license_plate_number.dart';
 
+import 'l10n/app_localizations.dart';
+
 void main() {
   runApp(const LicensePlateApp());
 }
+
+/// PopupMenuButton 的 onSelected 在弹出值为 null 时不触发（与取消菜单
+/// 无法区分），因此「跟随系统」项用一个非空的哨兵对象作为 value。
+const Object _systemDefaultValue = Object();
 
 class LicensePlateApp extends StatefulWidget {
   const LicensePlateApp({super.key});
@@ -16,6 +22,7 @@ class LicensePlateApp extends StatefulWidget {
 
 class _LicensePlateAppState extends State<LicensePlateApp> {
   Brightness _brightness = Brightness.light;
+  Locale? _locale;
 
   void _toggleTheme() {
     setState(() {
@@ -24,11 +31,21 @@ class _LicensePlateAppState extends State<LicensePlateApp> {
     });
   }
 
+  void _setLocale(Locale? locale) {
+    setState(() => _locale = locale);
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '车牌输入',
+      title: 'License Plate',
       debugShowCheckedModeBanner: false,
+      locale: _locale,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        ...globalDelegates,
+      ],
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
@@ -39,6 +56,8 @@ class _LicensePlateAppState extends State<LicensePlateApp> {
       home: PlateInputPage(
         brightness: _brightness,
         onToggleTheme: _toggleTheme,
+        currentLocale: _locale,
+        onLocaleChanged: _setLocale,
       ),
     );
   }
@@ -49,22 +68,31 @@ class PlateInputPage extends StatefulWidget {
     super.key,
     required this.brightness,
     required this.onToggleTheme,
+    required this.currentLocale,
+    required this.onLocaleChanged,
   });
 
   final Brightness brightness;
   final VoidCallback onToggleTheme;
+  final Locale? currentLocale;
+  final ValueChanged<Locale?> onLocaleChanged;
 
   @override
   State<PlateInputPage> createState() => _PlateInputPageState();
 }
 
 class _PlateInputPageState extends State<PlateInputPage> {
+  static const _patterns = [
+    PlatePatterns.china,
+    PlatePatterns.korea,
+    PlatePatterns.unitedStates,
+    PlatePatterns.japan,
+  ];
+
   final KeyboardController _controller = KeyboardController();
   PlatePattern _pattern = PlatePatterns.china;
   bool _haptic = true;
   bool _dismissOnTapOutside = true;
-  String _lastEvent = '等待输入…';
-  String _lastKey = '—';
 
   PlateStyles get _styles =>
       widget.brightness == Brightness.dark
@@ -78,26 +106,63 @@ class _PlateInputPageState extends State<PlateInputPage> {
       _controller
         ..pattern = pattern
         ..clear();
-      _lastEvent = '已切换到 ${pattern.name}';
     });
-  }
-
-  void _log(String event) {
-    setState(() => _lastEvent = event);
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final size = MediaQuery.of(context).size;
     final inputFieldWidth = min(size.width, size.height) / 11;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('车牌输入'),
+        title: Text(l10n.appTitle),
         centerTitle: true,
         actions: [
+          PopupMenuButton<Object>(
+            tooltip: l10n.languageTooltip,
+            icon: const Icon(Icons.translate),
+            onSelected: (value) {
+              widget.onLocaleChanged(
+                value == _systemDefaultValue ? null : value as Locale,
+              );
+            },
+            itemBuilder: (context) {
+              PopupMenuItem<Object> item(Object value, String label) {
+                final selected =
+                    value == _systemDefaultValue
+                        ? widget.currentLocale == null
+                        : widget.currentLocale == value;
+                return PopupMenuItem(
+                  value: value,
+                  child: Row(
+                    children: [
+                      Icon(
+                        selected ? Icons.check : Icons.circle,
+                        size: 16,
+                        color:
+                            selected
+                                ? theme.colorScheme.primary
+                                : Colors.transparent,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(label),
+                    ],
+                  ),
+                );
+              }
+
+              return [
+                item(_systemDefaultValue, l10n.systemDefault),
+                const PopupMenuDivider(),
+                for (final locale in AppLocalizations.supportedLocales)
+                  item(locale, AppLocalizations.localeName(locale)),
+              ];
+            },
+          ),
           IconButton(
-            tooltip: '切换主题',
+            tooltip: l10n.themeTooltip,
             icon: Icon(
               widget.brightness == Brightness.light
                   ? Icons.dark_mode_outlined
@@ -111,168 +176,93 @@ class _PlateInputPageState extends State<PlateInputPage> {
         behavior: HitTestBehavior.translucent,
         onTap: _dismissOnTapOutside ? _controller.hideKeyboard : null,
         child: SafeArea(
-          child: Column(
-            children: [
-              const SizedBox(height: 28),
-              PlateInputField(
-                pattern: _pattern,
-                styles: _styles,
-                keyboardController: _controller,
-                inputFieldWidth: inputFieldWidth,
-                inputFieldHeight: inputFieldWidth * 4 / 3,
-                enableHapticFeedback: _haptic,
-                dismissOnTapOutside: _dismissOnTapOutside,
-                onChanged: (array, value) => _log('onChanged → $value'),
-                onCompleted: (array, value) => _log('onCompleted → $value'),
-                onKeyPressed: (key) {
-                  setState(() => _lastKey = key.isEmpty ? '退格' : key);
-                },
-              ),
-              const SizedBox(height: 28),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _ResultCard(controller: _controller),
-                      const SizedBox(height: 24),
-                      Text('车牌制式', style: theme.textTheme.titleSmall),
-                      const SizedBox(height: 8),
-                      SegmentedButton<PlatePattern>(
-                        segments: const [
+          // 键盘是悬浮层，不会压缩页面：整个页面作为一个滚动视图，
+          // 键盘展开时追加底部留白，让任何控件都能滚到键盘上方操作。
+          child: ValueListenableBuilder<bool>(
+            valueListenable: _controller.keyboardShowing,
+            builder: (context, keyboardShowing, _) {
+              final bottomPadding = keyboardShowing ? size.height * 0.55 : 24.0;
+              return SingleChildScrollView(
+                padding: EdgeInsets.only(
+                  left: 20,
+                  right: 20,
+                  bottom: bottomPadding,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 28),
+                    PlateInputField(
+                      pattern: _pattern,
+                      styles: _styles,
+                      keyboardController: _controller,
+                      inputFieldWidth: inputFieldWidth,
+                      inputFieldHeight: inputFieldWidth * 4 / 3,
+                      completeText: l10n.complete,
+                      newEnergyPlaceHolder: l10n.newEnergy,
+                      semanticsLabel: l10n.semanticsField,
+                      enableHapticFeedback: _haptic,
+                      dismissOnTapOutside: _dismissOnTapOutside,
+                      onChanged:
+                          (array, value) => debugPrint('onChanged → $value'),
+                      onCompleted:
+                          (array, value) => debugPrint('onCompleted → $value'),
+                      onKeyPressed: (key) => debugPrint('key → $key'),
+                    ),
+                    const SizedBox(height: 28),
+                    Text(
+                      l10n.patternSection,
+                      style: theme.textTheme.titleSmall,
+                    ),
+                    const SizedBox(height: 8),
+                    SegmentedButton<PlatePattern>(
+                      showSelectedIcon: false,
+                      segments: [
+                        for (final pattern in _patterns)
                           ButtonSegment(
-                            value: PlatePatterns.china,
-                            label: Text('中国'),
+                            value: pattern,
+                            label: Text(l10n.patternName(pattern.code)),
                           ),
-                          ButtonSegment(
-                            value: PlatePatterns.korea,
-                            label: Text('韩国'),
+                      ],
+                      selected: {_pattern},
+                      onSelectionChanged: _selectPattern,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${_pattern.code} · ${l10n.slots(_pattern.slots.length)}',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Card(
+                      margin: EdgeInsets.zero,
+                      child: Column(
+                        children: [
+                          SwitchListTile(
+                            title: Text(l10n.hapticTitle),
+                            subtitle: Text(l10n.hapticSubtitle),
+                            value: _haptic,
+                            onChanged: (v) => setState(() => _haptic = v),
                           ),
-                          ButtonSegment(
-                            value: PlatePatterns.unitedStates,
-                            label: Text('美国'),
-                          ),
-                          ButtonSegment(
-                            value: PlatePatterns.japan,
-                            label: Text('日本'),
+                          const Divider(height: 1),
+                          SwitchListTile(
+                            title: Text(l10n.dismissTitle),
+                            subtitle: Text(l10n.dismissSubtitle),
+                            value: _dismissOnTapOutside,
+                            onChanged: (v) {
+                              setState(() => _dismissOnTapOutside = v);
+                            },
                           ),
                         ],
-                        selected: {_pattern},
-                        onSelectionChanged: _selectPattern,
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '${_pattern.code} · ${_pattern.slots.length} 位',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Card(
-                        margin: EdgeInsets.zero,
-                        child: Column(
-                          children: [
-                            SwitchListTile(
-                              title: const Text('触感反馈'),
-                              subtitle: const Text('按下按键时振动'),
-                              value: _haptic,
-                              onChanged: (v) => setState(() => _haptic = v),
-                            ),
-                            const Divider(height: 1),
-                            SwitchListTile(
-                              title: const Text('点击空白收起键盘'),
-                              subtitle: const Text('点击输入框空白区域时'),
-                              value: _dismissOnTapOutside,
-                              onChanged: (v) {
-                                setState(() => _dismissOnTapOutside = v);
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Card(
-                        margin: EdgeInsets.zero,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('事件', style: theme.textTheme.titleSmall),
-                              const SizedBox(height: 8),
-                              Text(
-                                _lastEvent,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                '最后按键：$_lastKey',
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// 实时展示当前输入的车牌号
-class _ResultCard extends StatelessWidget {
-  const _ResultCard({required this.controller});
-
-  final KeyboardController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Card(
-      margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 24),
-        child: ValueListenableBuilder<String>(
-          valueListenable: controller.valueNotifier,
-          builder: (context, value, child) {
-            final empty = value.isEmpty;
-            return Column(
-              children: [
-                Text(
-                  empty ? '点击上方输入框开始' : value,
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    letterSpacing: 2,
-                    fontWeight: FontWeight.w600,
-                    color:
-                        empty
-                            ? theme.colorScheme.outline
-                            : theme.colorScheme.onSurface,
-                  ),
-                ),
-                if (!empty) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    controller.characters.join(' '),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
                     ),
-                  ),
-                ],
-              ],
-            );
-          },
+                    const SizedBox(height: 24),
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
     );

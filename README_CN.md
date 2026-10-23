@@ -12,9 +12,22 @@ Flutter 车牌号输入组件，包含一个输入框和一个键盘。
 - 车牌号可选中单个号码进行修改
 - 数据驱动的多制式车牌，内置中国、韩国、美国、日本四种模式
 
-![](screenshots/screenshot_portrait.png)
+![](screenshots/screenshot_portrait_cn.png)
 
-![](screenshots/screenshot_landscape.png)
+![](screenshots/screenshot_landscape_cn.png)
+
+### 车牌制式
+
+内置中国、韩国、美国、日本四种模式，键盘布局与每个位置的可用字符均由
+模式数据决定。
+
+| 中国 | 韩国 |
+|---|---|
+| ![](screenshots/screenshot_portrait_cn.png) | ![](screenshots/screenshot_korea_cn.png) |
+
+| 日本（两行布局） | 美国（暗色主题） |
+|---|---|
+| ![](screenshots/screenshot_japan_cn.png) | ![](screenshots/screenshot_dark_cn.png) |
 
 
 ## 使用说明
