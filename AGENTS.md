@@ -86,4 +86,6 @@ Strictly follow these rules when touching plate business logic; do not "fix" the
 ## Other Notes
 
 - `README.md` (English) and `README_CN.md` (Chinese) must be kept in sync; user-visible behavior changes (new parameters, breaking changes) require updating both files plus `CHANGELOG.md`.
+- `CHANGELOG.md` is ordered newest first: the latest version entry stays at the top.
+- **Never release on your own**: do not bump version numbers, add release entries, run `flutter pub publish`, or create git tags unless the user explicitly asks.
 - Version bumps follow semantic versioning and are recorded in `CHANGELOG.md`.

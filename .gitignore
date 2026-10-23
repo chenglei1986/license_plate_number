@@ -78,3 +78,6 @@ build/
 
 # Library packages should not commit pubspec.lock
 pubspec.lock
+
+# Local agent learnings, not shared
+.learnings/
