@@ -4,12 +4,14 @@ import 'package:flutter/services.dart';
 import 'package:license_plate_number/license_plate_number.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   @override
-  _MyAppState createState() => _MyAppState();
+  State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
@@ -32,10 +34,11 @@ class _MyAppState extends State<MyApp> {
           actions: [
             /// AppBar 弹出菜单
             PopupMenuButton(
-              itemBuilder: (context) => [
-                PopupMenuItem(child: Text('dark'), value: 'dark'),
-                PopupMenuItem(child: Text('light'), value: 'light'),
-              ],
+              itemBuilder:
+                  (context) => [
+                    PopupMenuItem(value: 'dark', child: Text('dark')),
+                    PopupMenuItem(value: 'light', child: Text('light')),
+                  ],
               onSelected: (action) {
                 switch (action) {
                   /// 切换成黑暗主题
@@ -72,9 +75,10 @@ class _MyAppState extends State<MyApp> {
 }
 
 class MyHomePage extends StatelessWidget {
-  MyHomePage({
-    this.plateStyles,
-    this.keyboardController,
+  const MyHomePage({
+    super.key,
+    required this.plateStyles,
+    required this.keyboardController,
   });
 
   final PlateStyles plateStyles;
@@ -88,10 +92,15 @@ class MyHomePage extends StatelessWidget {
     double inputFieldWidth = min(screenWidth, screenHeight) / 10;
     double inputFieldHeight = inputFieldWidth * 4 / 3;
     if (screenWidth < screenHeight) {
-      SystemChrome.setEnabledSystemUIOverlays(
-          [SystemUiOverlay.top, SystemUiOverlay.bottom]);
+      SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.manual,
+        overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
+      );
     } else {
-      SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
+      SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.manual,
+        overlays: [SystemUiOverlay.bottom],
+      );
     }
     return Container(
       alignment: Alignment.topCenter,
