@@ -15,7 +15,7 @@ class PlateInputField extends StatefulWidget {
     this.keyboardController,
     this.pattern = PlatePatterns.china,
     this.completeText = '完成',
-    this.autoCompleteLength = 8,
+    this.autoCompleteLength,
     this.newEnergyPlaceHolder = '新能源',
     this.semanticsLabel = '车牌号',
     this.dismissOnTapOutside = false,
@@ -28,7 +28,8 @@ class PlateInputField extends StatefulWidget {
          'plateNumber\'s length should be less than or equal to 8.',
        ),
        assert(
-         autoCompleteLength >= 1 && autoCompleteLength <= 8,
+         autoCompleteLength == null ||
+             (autoCompleteLength >= 1 && autoCompleteLength <= 8),
          'autoCompleteLength should be between 1 and 8.',
        );
 
@@ -61,9 +62,10 @@ class PlateInputField extends StatefulWidget {
 
   /// 输入达到该长度时自动触发 [onCompleted] 并收起键盘。
   ///
-  /// 取值范围 1 ~ 8。默认 8，即新能源车牌（8 位）输满后自动完成；
+  /// 取值范围 1 ~ 8，为空时等于 [pattern] 的槽位数。
+  /// 中国车牌（8 槽位）默认 8，即新能源车牌输满后自动完成；
   /// 普通 7 位车牌可设为 7。
-  final int autoCompleteLength;
+  final int? autoCompleteLength;
 
   /// 新能源输入框占位文字
   final String newEnergyPlaceHolder;
@@ -121,7 +123,8 @@ class _PlateInputFieldState extends State<PlateInputField>
         'Length exceeds the slot count of the pattern.',
       );
     }
-    if (widget.autoCompleteLength > widget.pattern.slots.length) {
+    if (widget.autoCompleteLength != null &&
+        widget.autoCompleteLength! > widget.pattern.slots.length) {
       throw ArgumentError.value(
         widget.autoCompleteLength,
         'autoCompleteLength',
@@ -150,7 +153,8 @@ class _PlateInputFieldState extends State<PlateInputField>
     controller._plateNumber = controller._plateNumbers.join();
     if (value.isNotEmpty) {
       controller.valueNotifier.value = controller._plateNumber;
-      final completeAt = widget.autoCompleteLength - 1;
+      final completeAt =
+          (widget.autoCompleteLength ?? widget.pattern.slots.length) - 1;
       if (index >= completeAt && controller.cursorIndex >= completeAt) {
         // before close the keyboard, call the complete callback
         widget.onCompleted?.call(

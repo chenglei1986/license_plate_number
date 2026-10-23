@@ -103,4 +103,63 @@ abstract final class PlatePatterns {
     ],
     slotSeparators: [1],
   );
+
+  /// 韩国车牌（2006 式）：3 位数字 + 谚文字母 + 4 位数字，如 123가4567。
+  ///
+  /// 谚文字母集为乘用车常用 24 个；商用车等类型用字不同，可按需扩展。
+  static const PlatePattern korea = PlatePattern(
+    code: 'KR',
+    name: '韩国车牌',
+    slots: [
+      PlateSlot({...numbers}, keyPage: 0),
+      PlateSlot({...numbers}, keyPage: 0),
+      PlateSlot({...numbers}, keyPage: 0),
+      PlateSlot({...koreanLetters}, keyPage: 1),
+      PlateSlot({...numbers}, keyPage: 0),
+      PlateSlot({...numbers}, keyPage: 0),
+      PlateSlot({...numbers}, keyPage: 0),
+      PlateSlot({...numbers}, keyPage: 0),
+    ],
+    keyPages: [
+      KeyPage(
+        columns: 5,
+        keys: numbers,
+        aspectRatioPortrait: 3 / 2,
+        aspectRatioLandscape: 3 / 1,
+      ),
+      KeyPage(
+        columns: 8,
+        keys: koreanLetters,
+        aspectRatioPortrait: 3 / 4,
+        aspectRatioLandscape: 2 / 1,
+      ),
+    ],
+  );
+
+  /// 美国车牌通用宽松模式：3 + 4 位字母数字组合，如 ABC 1234。
+  ///
+  /// 各州规则差异很大（尺寸组合、禁用字母、vanity 自定义），
+  /// 此处为不限字母位置的通用模式，仅排除易混淆的 I 和 O。
+  static const PlatePattern unitedStates = PlatePattern(
+    code: 'US',
+    name: '美国车牌（通用）',
+    slots: [
+      PlateSlot({...numbers, ...letters}, keyPage: 0),
+      PlateSlot({...numbers, ...letters}, keyPage: 0),
+      PlateSlot({...numbers, ...letters}, keyPage: 0),
+      PlateSlot({...numbers, ...letters}, keyPage: 0),
+      PlateSlot({...numbers, ...letters}, keyPage: 0),
+      PlateSlot({...numbers, ...letters}, keyPage: 0),
+      PlateSlot({...numbers, ...letters}, keyPage: 0),
+    ],
+    keyPages: [
+      KeyPage(
+        columns: 10,
+        keys: [...numbers, ...letters],
+        aspectRatioPortrait: 2 / 3,
+        aspectRatioLandscape: 16 / 9,
+      ),
+    ],
+    slotSeparators: [2],
+  );
 }

@@ -17,6 +17,7 @@
 - Make `keyboardController` a required parameter of `PlateKeyboard`.
 - Add pubspec topics, issue tracker and screenshots; grow tests to 22 cases.
 - Introduce the `PlatePattern` data model (`PlateSlot` / `KeyPage` / `PlatePatterns`): slot character sets, key pages and separators are now data-driven; the built-in `PlatePatterns.china` reproduces the previous hardcoded behavior and all existing tests pass unchanged.
+- Add `PlatePatterns.korea` (123가4567, hangul key page) and `PlatePatterns.unitedStates` (generic 3+4 lenient mode) to validate the pattern abstraction; `autoCompleteLength` now defaults to the pattern's slot count.
 - Add `flutter_lints`, CI workflow and widget tests.
 
 ## 2.0.1

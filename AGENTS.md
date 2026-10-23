@@ -66,6 +66,7 @@ flutter pub publish --dry-run   # Pre-publish checks
   - `PlateInputField`: renders the plate input field, manages keyboard show/hide animations;
   - `PlateKeyboard`: the actual keyboard, sharing state with the input field via `KeyboardController`.
 - All country-specific rules live in `PlatePatterns` data (see `plate_patterns.dart`). The China pattern (`PlatePatterns.china`) is the default; adding a new country in the future means adding a new `PlatePattern` instance, not new code branches. Never reintroduce `if (index == ...)` style branching in the keyboard rendering.
+- Built-in patterns today: `china` (default), `korea`, `unitedStates`. Known gaps to keep in mind for future phases: variable-length slots (e.g. German district codes 1-3 letters) and multi-row layouts (e.g. Japanese two-row plates) are not supported by the fixed-slot single-row model yet.
 
 ## Domain Rules (Read Before Modifying)
 

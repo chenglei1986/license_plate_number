@@ -361,4 +361,85 @@ void main() {
       expect(controller.isKeyboardShowing(), isFalse);
     });
   });
+
+  group('PlatePatterns', () {
+    testWidgets('korea pattern switches between digit and hangul pages', (
+      tester,
+    ) async {
+      final controller = KeyboardController()..pattern = PlatePatterns.korea;
+      final typed = <String>[];
+      await tester.pumpWidget(
+        _wrap(
+          PlateKeyboard(
+            keyboardController: controller,
+            onChange: (index, value) => typed.add(value),
+          ),
+        ),
+      );
+
+      // Slot 0 shows the digit page; hangul keys are absent.
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('가'), findsNothing);
+
+      // Typing 1, 2, 3 moves the cursor to slot 3 (hangul page).
+      for (final ch in ['1', '2', '3']) {
+        await tester.tap(find.text(ch));
+        await tester.pumpAndSettle();
+      }
+      expect(controller.cursorIndex, 3);
+      expect(find.text('가'), findsOneWidget);
+      expect(find.text('1'), findsNothing);
+
+      await tester.tap(find.text('가'));
+      await tester.pumpAndSettle();
+      expect(typed, ['1', '2', '3', '가']);
+    });
+
+    testWidgets('unitedStates pattern completes after 7 chars by default', (
+      tester,
+    ) async {
+      String? completed;
+      await tester.pumpWidget(
+        _wrap(
+          PlateInputField(
+            pattern: PlatePatterns.unitedStates,
+            onCompleted: (array, value) => completed = value,
+          ),
+        ),
+      );
+
+      // 7 slots plus one separator after slot 2.
+      final row = tester.widget<Row>(
+        find.descendant(
+          of: find.byType(PlateInputField),
+          matching: find.byType(Row),
+        ),
+      );
+      expect(row.children.length, 8);
+
+      final firstField =
+          find
+              .descendant(
+                of: find.byType(PlateInputField),
+                matching: find.byType(GestureDetector),
+              )
+              .first;
+      await tester.tap(firstField);
+      await tester.pumpAndSettle();
+
+      for (final ch in 'ABC1234'.split('')) {
+        await _typeKey(tester, ch);
+      }
+      expect(completed, 'ABC1234');
+    });
+
+    test('controller adapts when switching to a new pattern', () {
+      final controller = KeyboardController();
+      controller.plateNumber = '沪A12345';
+      controller.pattern = PlatePatterns.unitedStates;
+      expect(controller.characters.length, 7);
+      expect(controller.cursorIndex, 6);
+      expect(() => controller.plateNumber = 'ABCDEFGH', throwsArgumentError);
+    });
+  });
 }

@@ -92,6 +92,8 @@ PlateInputField(
 
 自定义模式：键盘布局与每槽位规则由 `PlatePattern`（槽位、键盘页、分隔符）描述，
 内置 `PlatePatterns.china` 为默认模式，可通过 `PlateInputField` 的 `pattern:` 参数切换。
+内置模式：`PlatePatterns.china`（中国）、`PlatePatterns.korea`（韩国）、
+`PlatePatterns.unitedStates`（美国通用宽松模式）。
 
 
 
