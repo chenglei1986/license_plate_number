@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:license_plate_number/license_plate_number.dart';
 
@@ -13,6 +14,7 @@ class KeyboardButton extends StatefulWidget {
     this.pressedOpacity = 0.8,
     this.disabledColor = PlateStyles.keyboardButtonDisabledColorDark,
     this.borderRadius = const BorderRadius.all(Radius.circular(8.0)),
+    this.enableHapticFeedback = false,
     required this.onPressed,
   }) : assert(pressedOpacity >= 0.0 && pressedOpacity <= 1.0);
 
@@ -39,6 +41,9 @@ class KeyboardButton extends StatefulWidget {
 
   /// 边框圆角半径
   final BorderRadius borderRadius;
+
+  /// 按下按键时是否触发触感反馈
+  final bool enableHapticFeedback;
 
   /// 按键被按下时的事件响应回调函数
   final VoidCallback? onPressed;
@@ -67,24 +72,28 @@ class _KeyboardButtonState extends State<KeyboardButton> {
       onTap: widget.onPressed,
       child: Opacity(
         opacity: _buttonPressed ? widget.pressedOpacity : 1.0,
-        child: Semantics(
-          button: true,
-          label: widget.semanticsLabel,
-          child: Container(
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              borderRadius: widget.borderRadius,
-            ),
-            child: Center(
-              widthFactor: 1,
-              heightFactor: 1,
-              child: DefaultTextStyle(
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: widget.textSize,
-                  fontWeight: FontWeight.normal,
+        child: AnimatedScale(
+          scale: _buttonPressed ? 1.08 : 1.0,
+          duration: const Duration(milliseconds: 100),
+          child: Semantics(
+            button: true,
+            label: widget.semanticsLabel,
+            child: Container(
+              decoration: BoxDecoration(
+                color: backgroundColor,
+                borderRadius: widget.borderRadius,
+              ),
+              child: Center(
+                widthFactor: 1,
+                heightFactor: 1,
+                child: DefaultTextStyle(
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: widget.textSize,
+                    fontWeight: FontWeight.normal,
+                  ),
+                  child: widget.child,
                 ),
-                child: widget.child,
               ),
             ),
           ),
@@ -94,6 +103,9 @@ class _KeyboardButtonState extends State<KeyboardButton> {
   }
 
   void _handleTapDown(TapDownDetails event) {
+    if (widget.enableHapticFeedback) {
+      HapticFeedback.selectionClick();
+    }
     _buttonPressed = true;
     setState(() {});
   }

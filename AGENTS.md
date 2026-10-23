@@ -12,6 +12,9 @@ Core features:
 - Built-in native-like plate input keyboard (custom keyboard, not the system IME)
 - Supports portrait and landscape layouts
 - Supports common plates (7 characters) and new energy plates (8 characters)
+- New energy 8th position restricted to D/F letters per GA36 (digits stay enabled for large new energy plates)
+- Military plate first-position codes (军/空/海/北/沈/兰/济/南/广/成) and the 临 suffix key
+- Optional haptic feedback and key press scale animation
 - Plate numbers can be edited and deleted character by character
 
 ## Tech Stack
@@ -25,13 +28,14 @@ Core features:
 
 ```
 lib/
-  license_plate_number.dart    # Package entry, exports only 3 public API files
+  license_plate_number.dart    # Package entry, exports only 4 public API files
   src/
     plate_input_field.dart     # PlateInputField: plate input field + KeyboardController
-    plate_keyboard.dart        # PlateKeyboard: custom plate keyboard
+    plate_keyboard.dart        # PlateKeyboard: data-driven custom plate keyboard
+    plate_patterns.dart        # PlatePattern/PlateSlot/KeyPage: pattern data model + PlatePatterns.china
     plate_styles.dart          # PlateStyles: light/dark theme styles
     keyboard_button.dart       # Single key widget
-    constants.dart             # Province abbreviations, digits, letter layout constants
+    constants.dart             # CN plate key inventory (provinces, military codes, letters, suffixes)
 example/                       # Demo app (for manual verification)
 test/                          # Widget and unit tests
 .github/workflows/             # CI (flutter analyze + flutter test)
@@ -56,11 +60,12 @@ flutter pub publish --dry-run   # Pre-publish checks
 
 ## Public API Conventions
 
-- The package entry `lib/license_plate_number.dart` exports exactly three files: `plate_input_field.dart`, `plate_keyboard.dart`, `plate_styles.dart`.
+- The package entry `lib/license_plate_number.dart` exports exactly four files: `plate_input_field.dart`, `plate_keyboard.dart`, `plate_patterns.dart`, `plate_styles.dart`.
 - New public APIs must be exported through this entry; internal implementations (`keyboard_button.dart`, `constants.dart`, etc.) stay private and must not be exposed.
 - The two main widgets work together:
   - `PlateInputField`: renders the plate input field, manages keyboard show/hide animations;
   - `PlateKeyboard`: the actual keyboard, sharing state with the input field via `KeyboardController`.
+- All country-specific rules live in `PlatePatterns` data (see `plate_patterns.dart`). The China pattern (`PlatePatterns.china`) is the default; adding a new country in the future means adding a new `PlatePattern` instance, not new code branches. Never reintroduce `if (index == ...)` style branching in the keyboard rendering.
 
 ## Domain Rules (Read Before Modifying)
 
@@ -71,7 +76,9 @@ Strictly follow these rules when touching plate business logic; do not "fix" the
 3. **The 2nd character is the issuing authority letter**.
 4. **Letters I and O are not used** (easily confused with digits 1 and 0); they are excluded from the letter key layout.
 5. Key layouts (province page / alphanumeric page) are defined by the constant arrays in `constants.dart`; portrait and landscape are distinguished via `childAspectRatio`.
-6. Code comments are written in **Chinese**; keep new code consistent.
+6. The 8th position (index 7, new energy) only enables letters **D/F** plus all digits; special suffix keys (学/领/警/港/澳/挂/临) are enabled only at index 6 (the last position of common plates) and stay visible-but-disabled elsewhere.
+7. The first page also contains military plate codes from `militaryCodes`. The stray 'W' key was removed; 武警 WJ two-letter prefixes are NOT supported (would require a different input pattern).
+8. Code comments are written in **Chinese**; keep new code consistent.
 
 ## Code Style
 

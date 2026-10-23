@@ -114,6 +114,7 @@ class MyHomePage extends StatelessWidget {
         keyboardController: keyboardController,
         plateSeparatorPadding: 8,
         plateSeparatorSize: 6,
+        enableHapticFeedback: true,
         onChanged: (List<String> array, String value) {
           debugPrint('--- changed ---');
           debugPrint(array.toString());

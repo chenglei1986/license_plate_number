@@ -26,7 +26,6 @@ const provinces = [
   '云',
   '藏',
   '陕',
-  'W',
   '甘',
   '青',
   '宁',
@@ -35,10 +34,34 @@ const provinces = [
   '虚',
   '台',
 ];
+
+/// 军车号牌字头（2012 式：军种 / 军区代码，如 军A12345）
+const militaryCodes = ['军', '空', '海', '北', '沈', '兰', '济', '南', '广', '成'];
+
+/// 特殊后缀字符（学/领/警/港/澳/挂/临）
+const specials = ['学', '领', '警', '港', '澳', '挂', '临'];
+
 const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
-const alphabets = [
-  ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'P'],
-  ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
-  ['Z', 'X', 'C', 'V', 'B', 'N', 'M'],
+
+/// 字母按键行（不使用 I 和 O，与数字 1、0 易混淆）
+const lettersRow1 = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'P'];
+const lettersRow2 = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'];
+const lettersRow3 = ['Z', 'X', 'C', 'V', 'B', 'N', 'M'];
+
+/// 全部可用字母
+const letters = [...lettersRow1, ...lettersRow2, ...lettersRow3];
+
+/// 字母数字页按键顺序（数字 + 字母行 + 特殊后缀交错排列）
+const alnumKeys = [
+  ...numbers,
+  ...lettersRow1,
+  '学',
+  '领',
+  ...lettersRow2,
+  '警',
+  ...lettersRow3,
+  '港',
+  '澳',
+  '挂',
+  '临',
 ];
-const specials = ['学', '领', '警', '港', '澳', '挂'];

@@ -27,15 +27,11 @@ void main() {
 
     test('plateNumber longer than 8 throws ArgumentError', () {
       final controller = KeyboardController();
-      expect(
-        () => controller.plateNumber = '沪A1234567',
-        throwsArgumentError,
-      );
+      expect(() => controller.plateNumber = '沪A1234567', throwsArgumentError);
     });
 
     test('plateNumber can be cleared and rewritten', () {
-      final controller = KeyboardController()
-        ..plateNumber = '沪A12345';
+      final controller = KeyboardController()..plateNumber = '沪A12345';
       controller.plateNumber = '粤B';
       expect(controller.plateNumber, '粤B');
       expect(controller.cursorIndex, 2);
@@ -52,16 +48,34 @@ void main() {
     test('keyboardShowing defaults to false', () {
       expect(KeyboardController().isKeyboardShowing(), isFalse);
     });
+
+    test('clear() empties the plate and resets cursor', () {
+      final controller = KeyboardController()..plateNumber = '沪A12345';
+      controller.clear();
+      expect(controller.plateNumber, '');
+      expect(controller.cursorIndex, 0);
+      expect(controller.characters, ['', '', '', '', '', '', '', '']);
+    });
+
+    test('characters returns a read-only copy of the plate array', () {
+      final controller = KeyboardController()..plateNumber = '沪A';
+      expect(controller.characters.take(2), ['沪', 'A']);
+      expect(() => controller.characters.add('x'), throwsUnsupportedError);
+    });
   });
 
   group('PlateKeyboard', () {
     testWidgets('first position shows province keys only', (tester) async {
       final controller = KeyboardController();
       final typed = <String>[];
-      await tester.pumpWidget(_wrap(PlateKeyboard(
-        keyboardController: controller,
-        onChange: (index, value) => typed.add(value),
-      )));
+      await tester.pumpWidget(
+        _wrap(
+          PlateKeyboard(
+            keyboardController: controller,
+            onChange: (index, value) => typed.add(value),
+          ),
+        ),
+      );
 
       expect(find.text('沪'), findsOneWidget);
       expect(find.text('1'), findsNothing);
@@ -72,14 +86,17 @@ void main() {
       expect(controller.cursorIndex, 1);
     });
 
-    testWidgets('number keys are disabled on second position',
-        (tester) async {
+    testWidgets('number keys are disabled on second position', (tester) async {
       final controller = KeyboardController()..plateNumber = '沪';
       final typed = <String>[];
-      await tester.pumpWidget(_wrap(PlateKeyboard(
-        keyboardController: controller,
-        onChange: (index, value) => typed.add(value),
-      )));
+      await tester.pumpWidget(
+        _wrap(
+          PlateKeyboard(
+            keyboardController: controller,
+            onChange: (index, value) => typed.add(value),
+          ),
+        ),
+      );
 
       await tester.tap(find.text('1'));
       await tester.pumpAndSettle();
@@ -90,14 +107,19 @@ void main() {
       expect(typed, ['A']);
     });
 
-    testWidgets('backspace clears current char and moves cursor back',
-        (tester) async {
+    testWidgets('backspace clears current char and moves cursor back', (
+      tester,
+    ) async {
       final controller = KeyboardController()..plateNumber = '沪A';
       final changes = <int, String>{};
-      await tester.pumpWidget(_wrap(PlateKeyboard(
-        keyboardController: controller,
-        onChange: (index, value) => changes[index] = value,
-      )));
+      await tester.pumpWidget(
+        _wrap(
+          PlateKeyboard(
+            keyboardController: controller,
+            onChange: (index, value) => changes[index] = value,
+          ),
+        ),
+      );
 
       // Tap the backspace image button.
       final backspace = find.descendant(
@@ -109,34 +131,157 @@ void main() {
       expect(changes, {2: ''});
       expect(controller.cursorIndex, 1);
     });
+
+    testWidgets('province page includes military codes and no W key', (
+      tester,
+    ) async {
+      final controller = KeyboardController();
+      final typed = <String>[];
+      await tester.pumpWidget(
+        _wrap(
+          PlateKeyboard(
+            keyboardController: controller,
+            onChange: (index, value) => typed.add(value),
+          ),
+        ),
+      );
+
+      expect(find.text('军'), findsOneWidget);
+      expect(find.text('成'), findsOneWidget);
+      expect(find.text('W'), findsNothing);
+
+      await tester.tap(find.text('军'));
+      await tester.pumpAndSettle();
+      expect(typed, ['军']);
+    });
+
+    testWidgets('new energy slot only enables D/F letters and digits', (
+      tester,
+    ) async {
+      final controller = KeyboardController()..plateNumber = '沪A12345';
+      final typed = <String>[];
+      await tester.pumpWidget(
+        _wrap(
+          PlateKeyboard(
+            keyboardController: controller,
+            onChange: (index, value) => typed.add(value),
+          ),
+        ),
+      );
+      expect(controller.cursorIndex, 7);
+
+      // D and F are enabled.
+      await tester.tap(find.text('D'));
+      await tester.pumpAndSettle();
+      expect(typed, ['D']);
+
+      // Other letters are disabled.
+      await tester.tap(find.text('G'));
+      await tester.pumpAndSettle();
+      expect(typed, ['D']);
+
+      // Special suffixes stay visible but are disabled on the new energy slot.
+      await tester.tap(find.text('学'));
+      await tester.pumpAndSettle();
+      expect(typed, ['D']);
+      await tester.tap(find.text('临'));
+      await tester.pumpAndSettle();
+      expect(typed, ['D']);
+    });
+
+    testWidgets('special keys are enabled on last common position', (
+      tester,
+    ) async {
+      final controller = KeyboardController()..plateNumber = '沪A1234';
+      final typed = <String>[];
+      await tester.pumpWidget(
+        _wrap(
+          PlateKeyboard(
+            keyboardController: controller,
+            onChange: (index, value) => typed.add(value),
+          ),
+        ),
+      );
+      expect(controller.cursorIndex, 6);
+
+      await tester.tap(find.text('临'));
+      await tester.pumpAndSettle();
+      expect(typed, ['临']);
+    });
+
+    testWidgets('fits a small landscape surface without overflow', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(640, 360));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      final controller = KeyboardController();
+      await tester.pumpWidget(
+        _wrap(PlateKeyboard(keyboardController: controller)),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(PlateKeyboard), findsOneWidget);
+    });
+
+    testWidgets('onKeyPressed reports every key including backspace', (
+      tester,
+    ) async {
+      final controller = KeyboardController();
+      final pressed = <String>[];
+      await tester.pumpWidget(
+        _wrap(
+          PlateKeyboard(
+            keyboardController: controller,
+            onKeyPressed: pressed.add,
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('沪'));
+      await tester.pumpAndSettle();
+      final backspace = find.descendant(
+        of: find.byType(PlateKeyboard),
+        matching: find.byType(Image),
+      );
+      await tester.tap(backspace);
+      await tester.pumpAndSettle();
+      expect(pressed, ['沪', '']);
+    });
   });
 
   group('PlateInputField', () {
-    testWidgets('renders plate characters and new energy placeholder',
-        (tester) async {
+    testWidgets('renders plate characters and new energy placeholder', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-          _wrap(const PlateInputField(placeHolder: '沪A12345')));
+        _wrap(const PlateInputField(placeHolder: '沪A12345')),
+      );
       for (final ch in '沪A12345'.split('')) {
         expect(find.text(ch), findsOneWidget);
       }
       expect(find.text('新能源'), findsOneWidget);
     });
 
-    testWidgets('auto completes after 7 chars when autoCompleteLength is 7',
-        (tester) async {
+    testWidgets('auto completes after 7 chars when autoCompleteLength is 7', (
+      tester,
+    ) async {
       String? completed;
-      await tester.pumpWidget(_wrap(PlateInputField(
-        autoCompleteLength: 7,
-        onCompleted: (array, value) => completed = value,
-      )));
+      await tester.pumpWidget(
+        _wrap(
+          PlateInputField(
+            autoCompleteLength: 7,
+            onCompleted: (array, value) => completed = value,
+          ),
+        ),
+      );
 
       // Tap the first input field to show the keyboard on the province page.
-      final firstField = find
-          .descendant(
-            of: find.byType(PlateInputField),
-            matching: find.byType(GestureDetector),
-          )
-          .first;
+      final firstField =
+          find
+              .descendant(
+                of: find.byType(PlateInputField),
+                matching: find.byType(GestureDetector),
+              )
+              .first;
       await tester.tap(firstField);
       await tester.pumpAndSettle();
       expect(find.byType(PlateKeyboard), findsOneWidget);
@@ -150,12 +295,13 @@ void main() {
       expect(find.byType(PlateKeyboard), findsNothing);
     });
 
-    testWidgets('keyboard can be shown and hidden via controller',
-        (tester) async {
+    testWidgets('keyboard can be shown and hidden via controller', (
+      tester,
+    ) async {
       final controller = KeyboardController();
-      await tester.pumpWidget(_wrap(PlateInputField(
-        keyboardController: controller,
-      )));
+      await tester.pumpWidget(
+        _wrap(PlateInputField(keyboardController: controller)),
+      );
 
       controller.showKeyboard(tester.element(find.byType(PlateInputField)));
       await tester.pumpAndSettle();
@@ -166,6 +312,53 @@ void main() {
       await tester.pumpAndSettle();
       expect(controller.isKeyboardShowing(), isFalse);
       expect(find.byType(PlateKeyboard), findsNothing);
+    });
+
+    testWidgets('autoCompleteLength out of 1-8 throws', (tester) async {
+      expect(
+        () => PlateInputField(autoCompleteLength: 9),
+        throwsAssertionError,
+      );
+      expect(
+        () => PlateInputField(autoCompleteLength: 0),
+        throwsAssertionError,
+      );
+    });
+
+    testWidgets('newEnergyPlaceHolder is customizable', (tester) async {
+      await tester.pumpWidget(
+        _wrap(const PlateInputField(newEnergyPlaceHolder: 'NE')),
+      );
+      expect(find.text('NE'), findsOneWidget);
+      expect(find.text('新能源'), findsNothing);
+    });
+
+    testWidgets('input field exposes a text-field semantics node', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_wrap(const PlateInputField(placeHolder: '沪A')));
+      expect(find.bySemanticsLabel('车牌号'), findsOneWidget);
+    });
+
+    testWidgets('dismissOnTapOutside hides the keyboard', (tester) async {
+      final controller = KeyboardController();
+      await tester.pumpWidget(
+        _wrap(
+          PlateInputField(
+            keyboardController: controller,
+            dismissOnTapOutside: true,
+          ),
+        ),
+      );
+
+      controller.showKeyboard(tester.element(find.byType(PlateInputField)));
+      await tester.pumpAndSettle();
+      expect(controller.isKeyboardShowing(), isTrue);
+
+      // Tap the empty area of the input row, outside any character field.
+      await tester.tapAt(const Offset(10, 27));
+      await tester.pumpAndSettle();
+      expect(controller.isKeyboardShowing(), isFalse);
     });
   });
 }

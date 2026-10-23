@@ -66,14 +66,35 @@ _keyboardController.isKeyboardShowing();
 
 /// Modify plate number
 _keyboardController.plateNumber = 'XXXXXXX';
+
+/// Clear plate number
+_keyboardController.clear();
+
+/// Read the plate characters as an array
+List<String> characters = _keyboardController.characters;
 ```
 
 ```dart
 PlateInputField(
   /// Pass KeyboardController to PlateInputField
   keyboardController: _keyboardController,
+  /// Optional: complete after 7 chars for common plates
+  autoCompleteLength: 7,
+  /// Optional: haptic feedback on key press
+  enableHapticFeedback: true,
+  /// Optional: hide the keyboard when tapping outside the input fields
+  dismissOnTapOutside: true,
 );
 ```
+
+Keyboard rules: the 8th position (new energy) only allows letters D/F and
+digits; special suffix keys (学/领/警/港/澳/挂/临) are enabled on the last
+position of common plates; the first page also contains military plate codes
+(军/空/海/北/沈/兰/济/南/广/成).
+
+Custom patterns: the keyboard layout and per-position rules are described by
+`PlatePattern` (slots, key pages, separators). `PlatePatterns.china` is the
+default; pass `pattern:` to `PlateInputField` to use another country format.
 
 
 ### Styles

@@ -9,6 +9,14 @@
 - Fix the documented standalone usage of `KeyboardController.showKeyboard` without an `AnimationController`.
 - Remove the keyboard overlay entry after the exit animation.
 - Add `Semantics` to keyboard keys.
+- Restrict the 8th position (new energy) letters to D/F per GA36; digits stay enabled for large new energy plates.
+- Add military plate first-position codes (军/空/海/北/沈/兰/济/南/广/成) and the 临 suffix key; remove the invalid 'W' province key (武警 WJ two-letter prefixes are not supported).
+- Add `newEnergyPlaceHolder`, `semanticsLabel`, `dismissOnTapOutside`, `enableHapticFeedback` and `onKeyPressed` to `PlateInputField`.
+- Add haptic feedback (opt-in) and a key press scale animation to keyboard keys.
+- Add `clear()` and `characters` to `KeyboardController`.
+- Make `keyboardController` a required parameter of `PlateKeyboard`.
+- Add pubspec topics, issue tracker and screenshots; grow tests to 22 cases.
+- Introduce the `PlatePattern` data model (`PlateSlot` / `KeyPage` / `PlatePatterns`): slot character sets, key pages and separators are now data-driven; the built-in `PlatePatterns.china` reproduces the previous hardcoded behavior and all existing tests pass unchanged.
 - Add `flutter_lints`, CI workflow and widget tests.
 
 ## 2.0.1

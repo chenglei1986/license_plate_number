@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:license_plate_number/license_plate_number.dart';
-import 'package:license_plate_number/src/constants.dart';
 import 'package:license_plate_number/src/keyboard_button.dart';
 
 typedef PlateNumberChanged = void Function(int index, String value);
@@ -10,11 +9,13 @@ class PlateKeyboard extends StatefulWidget {
   const PlateKeyboard({
     super.key,
     this.plateNumbers = const [],
-    this.keyboardController,
+    required this.keyboardController,
     this.styles = PlateStyles.light,
     this.newEnergy = false,
     this.completeText = '完成',
+    this.enableHapticFeedback = false,
     this.onChange,
+    this.onKeyPressed,
     this.animationController,
     this.onComplete,
   });
@@ -28,7 +29,13 @@ class PlateKeyboard extends StatefulWidget {
 
   /// 完成按钮文字
   final String completeText;
+
+  /// 按下按键时是否触发触感反馈
+  final bool enableHapticFeedback;
   final PlateNumberChanged? onChange;
+
+  /// 任意按键（含退格，退格值为空字符串）被按下时的回调
+  final ValueChanged<String>? onKeyPressed;
   final AnimationController? animationController;
   final VoidCallback? onComplete;
 
@@ -53,13 +60,13 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
 
   @override
   Widget build(BuildContext context) {
-    int index = widget.keyboardController!.cursorIndex;
-    double childAspectRatio;
-    if (MediaQuery.of(context).orientation == Orientation.portrait) {
-      childAspectRatio = 0 == index ? 3 / 4 : 2 / 3;
-    } else {
-      childAspectRatio = 0 == index ? 2 / 1 : 16 / 9;
-    }
+    final controller = widget.keyboardController!;
+    final slot = controller.pattern.slots[controller.cursorIndex];
+    final page = controller.pattern.keyPages[slot.keyPage];
+    final childAspectRatio =
+        MediaQuery.of(context).orientation == Orientation.portrait
+            ? page.aspectRatioPortrait
+            : page.aspectRatioLandscape;
     final keyboard = SafeArea(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -85,7 +92,7 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
             padding: const EdgeInsets.all(10),
             alignment: Alignment.bottomCenter,
             child: GridView.count(
-              crossAxisCount: 0 == index ? 9 : 10,
+              crossAxisCount: page.columns,
               childAspectRatio: childAspectRatio,
               shrinkWrap: true,
               mainAxisSpacing: 4,
@@ -105,55 +112,14 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
   }
 
   List<Widget> _buildKeys() {
-    List<Widget> keys = [];
-    int index = widget.keyboardController!.cursorIndex;
-    if (0 == index) {
-      /// 省份
-      for (final element in provinces) {
-        keys.add(_buildKeyboardButton(element, true));
-      }
-    } else {
-      /// 数字
-      for (final element in numbers) {
-        keys.add(_buildKeyboardButton(element, index > 1));
-      }
-
-      /// 字母 Q ~ P
-      for (final element in alphabets[0]) {
-        keys.add(_buildKeyboardButton(element, true));
-      }
-      if (index > 5) {
-        keys.add(_buildKeyboardButton(specials[0], true));
-      }
-
-      /// 领
-      keys.add(_buildKeyboardButton(specials[1], index >= 6));
-
-      /// 字母 A ~ L
-      for (final element in alphabets[1]) {
-        keys.add(_buildKeyboardButton(element, index > 0));
-      }
-
-      /// 警
-      keys.add(_buildKeyboardButton(specials[2], index >= 6));
-
-      /// 字母 Z ~ M
-      for (final element in alphabets[2]) {
-        keys.add(_buildKeyboardButton(element, index > 0));
-      }
-
-      /// 港
-      keys.add(_buildKeyboardButton(specials[3], index >= 6));
-
-      /// 澳
-      keys.add(_buildKeyboardButton(specials[4], index >= 6));
-
-      /// 挂
-      keys.add(_buildKeyboardButton(specials[5], index >= 6));
-    }
-
-    /// 退格
-    keys.add(_buildBackspace());
+    final controller = widget.keyboardController!;
+    final slot = controller.pattern.slots[controller.cursorIndex];
+    final page = controller.pattern.keyPages[slot.keyPage];
+    final keys = <Widget>[
+      for (final key in page.keys)
+        _buildKeyboardButton(key, slot.chars.contains(key)),
+      _buildBackspace(),
+    ];
     return keys;
   }
 
@@ -169,11 +135,13 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
                 int index = widget.keyboardController!.cursorIndex;
                 if (index <= 7) {
                   widget.onChange?.call(index, data);
+                  widget.onKeyPressed?.call(data);
                   widget.keyboardController!.cursorIndex++;
                   setState(() {});
                 }
               }
               : null,
+      enableHapticFeedback: widget.enableHapticFeedback,
       child: Text(data),
     );
   }
@@ -185,11 +153,13 @@ class _PlateKeyboardState extends State<PlateKeyboard> {
       onPressed: () {
         int index = widget.keyboardController!.cursorIndex;
         widget.onChange?.call(index, '');
+        widget.onKeyPressed?.call('');
         if (index > 0) {
           widget.keyboardController!.cursorIndex--;
         }
         setState(() {});
       },
+      enableHapticFeedback: widget.enableHapticFeedback,
       child: Image(
         image: const AssetImage(
           'images/backspace.png',

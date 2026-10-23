@@ -13,13 +13,23 @@ class PlateInputField extends StatefulWidget {
     this.plateSeparatorSize = 6,
     this.plateSeparatorPadding = 8,
     this.keyboardController,
+    this.pattern = PlatePatterns.china,
     this.completeText = '完成',
     this.autoCompleteLength = 8,
+    this.newEnergyPlaceHolder = '新能源',
+    this.semanticsLabel = '车牌号',
+    this.dismissOnTapOutside = false,
+    this.enableHapticFeedback = false,
     this.onChanged,
     this.onCompleted,
+    this.onKeyPressed,
   }) : assert(
          placeHolder.length <= 8,
-         'plateNumber\'s length should be less than 8.',
+         'plateNumber\'s length should be less than or equal to 8.',
+       ),
+       assert(
+         autoCompleteLength >= 1 && autoCompleteLength <= 8,
+         'autoCompleteLength should be between 1 and 8.',
        );
 
   /// 车牌号
@@ -43,6 +53,9 @@ class PlateInputField extends StatefulWidget {
   /// 键盘控制器
   final KeyboardController? keyboardController;
 
+  /// 车牌模式，决定槽位数、每槽字符集与键盘布局
+  final PlatePattern pattern;
+
   /// 键盘完成按钮文字
   final String completeText;
 
@@ -51,6 +64,18 @@ class PlateInputField extends StatefulWidget {
   /// 取值范围 1 ~ 8。默认 8，即新能源车牌（8 位）输满后自动完成；
   /// 普通 7 位车牌可设为 7。
   final int autoCompleteLength;
+
+  /// 新能源输入框占位文字
+  final String newEnergyPlaceHolder;
+
+  /// 输入框的无障碍语义标签
+  final String semanticsLabel;
+
+  /// 是否开启键盘外（输入框空白区域）点击收起键盘
+  final bool dismissOnTapOutside;
+
+  /// 按下键盘按键时是否触发触感反馈
+  final bool enableHapticFeedback;
 
   /// 完成后的回调
   ///
@@ -63,6 +88,9 @@ class PlateInputField extends StatefulWidget {
   /// * [array] - 车牌号字符数组
   /// * [value] - 车牌号字符串
   final void Function(List<String> array, String value)? onChanged;
+
+  /// 任意键盘按键（含退格，退格值为空字符串）被按下时的回调
+  final ValueChanged<String>? onKeyPressed;
 
   @override
   State<PlateInputField> createState() => _PlateInputFieldState();
@@ -85,6 +113,21 @@ class _PlateInputFieldState extends State<PlateInputField>
       vsync: this,
     );
     _keyboardController = widget.keyboardController ?? KeyboardController();
+    _keyboardController.pattern = widget.pattern;
+    if (widget.placeHolder.length > widget.pattern.slots.length) {
+      throw ArgumentError.value(
+        widget.placeHolder,
+        'placeHolder',
+        'Length exceeds the slot count of the pattern.',
+      );
+    }
+    if (widget.autoCompleteLength > widget.pattern.slots.length) {
+      throw ArgumentError.value(
+        widget.autoCompleteLength,
+        'autoCompleteLength',
+        'Exceeds the slot count of the pattern.',
+      );
+    }
     _keyboardController.plateNumber = plateNumber;
     _keyboardController.onPlateNumberChanged = onPlateNumberChanged;
     _keyboardController.animationController = _controller;
@@ -126,7 +169,10 @@ class _PlateInputFieldState extends State<PlateInputField>
   Widget build(BuildContext context) {
     _keyboardController
       ..styles = widget.styles
-      ..completeText = widget.completeText;
+      ..completeText = widget.completeText
+      ..enableHapticFeedback = widget.enableHapticFeedback
+      ..onKeyPressed = widget.onKeyPressed
+      ..pattern = widget.pattern;
     return ValueListenableBuilder<bool>(
       valueListenable: _keyboardController.keyboardShowing,
       builder: (context, showing, child) {
@@ -140,10 +186,27 @@ class _PlateInputFieldState extends State<PlateInputField>
           child: ValueListenableBuilder<String>(
             valueListenable: _keyboardController.valueNotifier,
             builder: (context, value, child) {
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: _buildInputFields(),
+              Widget field = Semantics(
+                textField: true,
+                label: widget.semanticsLabel,
+                value: value.isEmpty ? null : value,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: _buildInputFields(),
+                ),
               );
+              if (widget.dismissOnTapOutside) {
+                field = GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: () {
+                    if (_keyboardController.isKeyboardShowing()) {
+                      _keyboardController.hideKeyboard();
+                    }
+                  },
+                  child: field,
+                );
+              }
+              return field;
             },
           ),
         );
@@ -152,10 +215,11 @@ class _PlateInputFieldState extends State<PlateInputField>
   }
 
   List<Widget> _buildInputFields() {
+    final pattern = widget.pattern;
     List<Widget> children = [];
-    for (int i = 0; i < _keyboardController._plateNumbers.length; i++) {
+    for (int i = 0; i < pattern.slots.length; i++) {
       children.add(_buildSingleField(_keyboardController._plateNumbers[i], i));
-      if (1 == i) {
+      if (pattern.slotSeparators.contains(i)) {
         children.add(_buildSeparator());
       }
     }
@@ -164,26 +228,27 @@ class _PlateInputFieldState extends State<PlateInputField>
 
   Widget _buildSingleField(String data, int index) {
     bool focused = _keyboardController.cursorIndex == index;
-    bool newEnergy = index == 7;
+    final placeholder = widget.pattern.slots[index].placeholder;
+    bool hasPlaceholder = placeholder != null;
     Border commonBorder =
         focused
             ? widget.styles.plateInputFocusedBorder
             : widget.styles.plateInputBorder;
-    Border border = newEnergy && !focused ? const Border() : commonBorder;
+    Border border = hasPlaceholder && !focused ? const Border() : commonBorder;
     var text = Text(
-      data.isEmpty && newEnergy ? '新能源' : data,
+      data.isEmpty && hasPlaceholder ? (widget.newEnergyPlaceHolder) : data,
       style:
-          newEnergy && data.isEmpty
+          hasPlaceholder && data.isEmpty
               ? widget.styles.newEnergyPlaceHolderTextStyle
               : widget.styles.plateInputFieldTextStyle,
     );
     var container = Container(
       width:
-          newEnergy && !focused
+          hasPlaceholder && !focused
               ? widget.inputFieldWidth - 4
               : widget.inputFieldWidth,
       height:
-          newEnergy && !focused
+          hasPlaceholder && !focused
               ? widget.inputFieldHeight - 4
               : widget.inputFieldHeight,
       alignment: Alignment.center,
@@ -205,9 +270,11 @@ class _PlateInputFieldState extends State<PlateInputField>
       child: container,
     );
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: newEnergy && !focused ? 3 : 2),
+      padding: EdgeInsets.symmetric(
+        horizontal: hasPlaceholder && !focused ? 3 : 2,
+      ),
       child: GestureDetector(
-        child: newEnergy && !focused ? newEnergyField : container,
+        child: hasPlaceholder && !focused ? newEnergyField : container,
         onTap: () {
           _keyboardController.cursorIndex = index;
           _keyboardController.showKeyboard(context);
@@ -234,25 +301,49 @@ class _PlateInputFieldState extends State<PlateInputField>
 class KeyboardController {
   KeyboardController();
 
-  /// 车牌号码数组
-  final List<String> _plateNumbers = ['', '', '', '', '', '', '', ''];
+  /// 车牌号码数组，长度与 [pattern] 的槽位数一致
+  List<String> _plateNumbers = List.filled(
+    PlatePatterns.china.slots.length,
+    '',
+    growable: true,
+  );
 
   /// 车牌号
   String _plateNumber = '';
 
   int _cursorIndex = 0;
 
-  /// 当前光标位置，取值 0 ~ 7，越界赋值会被截断
+  PlatePattern _pattern = PlatePatterns.china;
+
+  /// 当前光标位置，取值 0 ~ 槽位数-1，越界赋值会被截断
   int get cursorIndex => _cursorIndex;
 
   set cursorIndex(int value) {
+    final maxIndex = _pattern.slots.length - 1;
     if (value < 0) {
       _cursorIndex = 0;
-    } else if (value > 7) {
-      _cursorIndex = 7;
+    } else if (value > maxIndex) {
+      _cursorIndex = maxIndex;
     } else {
       _cursorIndex = value;
     }
+  }
+
+  /// 车牌模式，决定槽位数、字符集与键盘布局
+  PlatePattern get pattern => _pattern;
+
+  set pattern(PlatePattern value) {
+    _pattern = value;
+    if (_plateNumbers.length != value.slots.length) {
+      final old = _plateNumbers;
+      _plateNumbers = List.generate(
+        value.slots.length,
+        (i) => i < old.length ? old[i] : '',
+      );
+    }
+    cursorIndex = _cursorIndex;
+    _plateNumber = _plateNumbers.join();
+    valueNotifier.value = _plateNumber;
   }
 
   /// 车牌号变化通知器
@@ -263,6 +354,12 @@ class KeyboardController {
 
   /// 键盘完成按钮文字
   String completeText = '完成';
+
+  /// 按下键盘按键时是否触发触感反馈
+  bool enableHapticFeedback = false;
+
+  /// 任意按键（含退格，退格值为空字符串）被按下时的回调
+  ValueChanged<String>? onKeyPressed;
 
   /// 键盘悬浮窗口
   OverlayEntry? _keyboardOverlay;
@@ -275,13 +372,13 @@ class KeyboardController {
   void Function(int index, String value)? _onPlateNumberChanged;
   void Function(List<String> array, String value)? _onCompleted;
 
-  /// 设置车牌号，长度不能超过 8 位
+  /// 设置车牌号，长度不能超过当前模式的槽位数
   set plateNumber(String plateNumber) {
-    if (plateNumber.length > 8) {
+    if (plateNumber.length > _plateNumbers.length) {
       throw ArgumentError.value(
         plateNumber,
         'plateNumber',
-        'Length must be less than or equal to 8.',
+        'Length must be less than or equal to the slot count of the pattern.',
       );
     }
     _plateNumber = plateNumber;
@@ -293,6 +390,14 @@ class KeyboardController {
   }
 
   String get plateNumber => _plateNumber;
+
+  /// 清空车牌号
+  void clear() {
+    plateNumber = '';
+  }
+
+  /// 车牌号字符数组（只读副本）
+  List<String> get characters => List.unmodifiable(_plateNumbers);
 
   set animationController(AnimationController? controller) =>
       _controller = controller;
@@ -318,9 +423,11 @@ class KeyboardController {
           plateNumbers: _plateNumbers,
           keyboardController: this,
           styles: _styles,
-          newEnergy: cursorIndex == 7,
+          newEnergy: cursorIndex == _pattern.slots.length - 1,
           completeText: completeText,
+          enableHapticFeedback: enableHapticFeedback,
           onChange: _onPlateNumberChanged,
+          onKeyPressed: onKeyPressed,
           animationController: _controller,
           onComplete: () {
             if (_onCompleted != null) {

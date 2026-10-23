@@ -66,14 +66,32 @@ _keyboardController.isKeyboardShowing();
 
 /// 修改车牌号
 _keyboardController.plateNumber = 'XXXXXXX';
+
+/// 清空车牌号
+_keyboardController.clear();
+
+/// 读取车牌号字符数组
+List<String> characters = _keyboardController.characters;
 ```
 
 ```dart
 PlateInputField(
   /// 设置 KeyboardController
   keyboardController: _keyboardController,
+  /// 可选：普通 7 位车牌输满 7 位自动完成
+  autoCompleteLength: 7,
+  /// 可选：按键触感反馈
+  enableHapticFeedback: true,
+  /// 可选：点击输入框空白区域收起键盘
+  dismissOnTapOutside: true,
 );
 ```
+
+键盘规则：第 8 位（新能源）仅允许字母 D/F 和数字；特殊后缀键（学/领/警/港/澳/挂/临）
+仅在普通车牌最后一位可用；省份页同时提供军车字头（军/空/海/北/沈/兰/济/南/广/成）。
+
+自定义模式：键盘布局与每槽位规则由 `PlatePattern`（槽位、键盘页、分隔符）描述，
+内置 `PlatePatterns.china` 为默认模式，可通过 `PlateInputField` 的 `pattern:` 参数切换。
 
 
 
