@@ -14,6 +14,8 @@ class PlateStyles {
     this.keyboardButtonTextColor = keyboardButtonTextColorLight,
     this.keyboardButtonColor = keyboardButtonColorLight,
     this.keyboardButtonDisabledColor = keyboardButtonDisabledColorLight,
+    this.completeButtonTextColor = completeButtonTextColorLight,
+    this.newEnergyBorderColor = newEnergyBorderColorLight,
   });
 
   /// 车牌号字体样式
@@ -49,6 +51,12 @@ class PlateStyles {
   /// 键盘按钮不可用时的背景色
   final Color keyboardButtonDisabledColor;
 
+  /// 键盘完成按钮文字颜色
+  final Color completeButtonTextColor;
+
+  /// 新能源输入框虚线边框颜色
+  final Color newEnergyBorderColor;
+
   /// 黑暗风格车牌号字体样式
   static const TextStyle plateInputFieldTextStyleDark = TextStyle(
     color: Color(0xFFFFFFFF),
@@ -67,19 +75,14 @@ class PlateStyles {
   static const Color plateInputFieldColorDark = Color(0xFF4A4A4A);
 
   /// 黑暗风格输入框边框
-  static const Border plateInputBorderDark = Border.fromBorderSide(BorderSide(
-    color: Color(0xFFFFFFFF),
-    width: 2,
-    style: BorderStyle.solid,
-  ));
+  static const Border plateInputBorderDark = Border.fromBorderSide(
+    BorderSide(color: Color(0xFFFFFFFF), width: 2, style: BorderStyle.solid),
+  );
 
   /// 黑暗风格输入框获取焦点时的边框
-  static const Border plateInputFocusedBorderDark =
-      Border.fromBorderSide(BorderSide(
-    color: Color(0xFF2196F3),
-    width: 2,
-    style: BorderStyle.solid,
-  ));
+  static const Border plateInputFocusedBorderDark = Border.fromBorderSide(
+    BorderSide(color: Color(0xFF2196F3), width: 2, style: BorderStyle.solid),
+  );
 
   /// 黑暗风格分隔符的颜色
   static const Color plateSeparatorColorDark = Color(0xFFFFFFFF);
@@ -95,6 +98,18 @@ class PlateStyles {
 
   /// 黑暗风格键盘按钮不可用时的背景色
   static const Color keyboardButtonDisabledColorDark = Color(0x994A4A4A);
+
+  /// 黑暗风格完成按钮文字颜色
+  static const Color completeButtonTextColorDark = Color(0xFF2196F3);
+
+  /// 黑暗风格新能源输入框虚线边框颜色
+  static const Color newEnergyBorderColorDark = Color(0xFF666666);
+
+  /// 明亮风格完成按钮文字颜色
+  static const Color completeButtonTextColorLight = Color(0xFF2196F3);
+
+  /// 明亮风格新能源输入框虚线边框颜色
+  static const Color newEnergyBorderColorLight = Color(0xFF666666);
 
   /// 明亮风格车牌号字体样式
   static const TextStyle plateInputFieldTextStyleLight = TextStyle(
@@ -114,19 +129,14 @@ class PlateStyles {
   static const Color plateInputFieldColorLight = Color(0xFFFFFFFF);
 
   /// 明亮风格输入框边框
-  static const Border plateInputBorderLight = Border.fromBorderSide(BorderSide(
-    color: Color(0xFF333333),
-    width: 2,
-    style: BorderStyle.solid,
-  ));
+  static const Border plateInputBorderLight = Border.fromBorderSide(
+    BorderSide(color: Color(0xFF333333), width: 2, style: BorderStyle.solid),
+  );
 
   /// 明亮风格输入框获取焦点时的边框
-  static const Border plateInputFocusedBorderLight =
-      Border.fromBorderSide(BorderSide(
-    color: Color(0xFF2196F3),
-    width: 2,
-    style: BorderStyle.solid,
-  ));
+  static const Border plateInputFocusedBorderLight = Border.fromBorderSide(
+    BorderSide(color: Color(0xFF2196F3), width: 2, style: BorderStyle.solid),
+  );
 
   /// 明亮风格分隔符的颜色
   static const Color plateSeparatorColorLight = Color(0xFF333333);
@@ -144,33 +154,37 @@ class PlateStyles {
   static const Color keyboardButtonDisabledColorLight = Color(0x99FFFFFF);
 
   /// 黑暗风格
-  static const PlateStyles dark = const PlateStyles(
+  static const PlateStyles dark = PlateStyles(
     plateInputFieldTextStyle: plateInputFieldTextStyleDark,
     newEnergyPlaceHolderTextStyle: newEnergyPlaceHolderTextStyleDark,
     plateInputFieldColor: plateInputFieldColorDark,
     plateInputBorder: plateInputBorderDark,
     plateInputFocusedBorder: plateInputFocusedBorderDark,
-    plateInputBorderRadius: const Radius.circular(8.0),
+    plateInputBorderRadius: Radius.circular(8.0),
     plateSeparatorColor: plateSeparatorColorDark,
     keyboardBackgroundColor: keyboardBackgroundColorDark,
     keyboardButtonTextColor: keyboardButtonTextColorDark,
     keyboardButtonColor: keyboardButtonColorDark,
     keyboardButtonDisabledColor: keyboardButtonDisabledColorDark,
+    completeButtonTextColor: completeButtonTextColorDark,
+    newEnergyBorderColor: newEnergyBorderColorDark,
   );
 
   /// 明亮风格
-  static const PlateStyles light = const PlateStyles(
+  static const PlateStyles light = PlateStyles(
     plateInputFieldTextStyle: plateInputFieldTextStyleLight,
     newEnergyPlaceHolderTextStyle: newEnergyPlaceHolderTextStyleLight,
     plateInputFieldColor: plateInputFieldColorLight,
     plateInputBorder: plateInputBorderLight,
     plateInputFocusedBorder: plateInputFocusedBorderLight,
-    plateInputBorderRadius: const Radius.circular(8.0),
+    plateInputBorderRadius: Radius.circular(8.0),
     plateSeparatorColor: plateSeparatorColorLight,
     keyboardBackgroundColor: keyboardBackgroundColorLight,
     keyboardButtonTextColor: keyboardButtonTextColorLight,
     keyboardButtonColor: keyboardButtonColorLight,
     keyboardButtonDisabledColor: keyboardButtonDisabledColorLight,
+    completeButtonTextColor: completeButtonTextColorLight,
+    newEnergyBorderColor: newEnergyBorderColorLight,
   );
 
   PlateStyles copyWith({
@@ -185,6 +199,8 @@ class PlateStyles {
     Color? keyboardButtonTextColor,
     Color? keyboardButtonColor,
     Color? keyboardButtonDisabledColor,
+    Color? completeButtonTextColor,
+    Color? newEnergyBorderColor,
   }) {
     return PlateStyles(
       plateInputFieldTextStyle:
@@ -205,6 +221,9 @@ class PlateStyles {
       keyboardButtonColor: keyboardButtonColor ?? this.keyboardButtonColor,
       keyboardButtonDisabledColor:
           keyboardButtonDisabledColor ?? this.keyboardButtonDisabledColor,
+      completeButtonTextColor:
+          completeButtonTextColor ?? this.completeButtonTextColor,
+      newEnergyBorderColor: newEnergyBorderColor ?? this.newEnergyBorderColor,
     );
   }
 }

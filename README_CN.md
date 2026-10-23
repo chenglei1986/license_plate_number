@@ -22,7 +22,7 @@ Flutter 车牌号输入组件，包含一个输入框和一个键盘。
 
 ```yaml
 dependencies:
-  license_plate_number: ^2.0.1
+  license_plate_number: ^2.1.0
 ```
 
 ### 基本用法
@@ -33,18 +33,19 @@ Package 包含两个主要的组件，`PlateInputField`  和 `PlateKeyboard` 。
 
 ```dart
 Container(
+  alignment: Alignment.center,
   child: PlateInputField(
     placeHolder: '沪A12345', // 初始值
-    style: PlateStyle.light, // 主题
+    styles: PlateStyles.light, // 主题
     inputFieldWidth: 40,     // 单个输入框宽度
     inputFieldHeight: 54,    // 单个输入框高度
-    onChange: (List<String> array, String value) {
+    autoCompleteLength: 7,   // 输满 7 位自动完成，新能源 8 位车牌可设为 8
+    onChanged: (List<String> array, String value) {
       // 监听输入内容
       // array ['沪', 'A', '1', '2', '3', '4', '5']
       // value 沪A12345
     },
-  );
-  alignment: Alignment.center,
+  ),
 )
 ```
 
@@ -128,7 +129,7 @@ PlateStyles(
 ```dart
 /// 方式二，使用默认主题替换
 PlateStyles.dark.copyWith(
-  keyboardBackgroundColorDark: Color(0xFF000000),
+  keyboardBackgroundColor: Color(0xFF000000),
 );
 ```
 

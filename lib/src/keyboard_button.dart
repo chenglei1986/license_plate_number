@@ -4,8 +4,9 @@ import 'package:license_plate_number/license_plate_number.dart';
 /// 车牌号输入键盘按键
 class KeyboardButton extends StatefulWidget {
   const KeyboardButton({
-    Key? key,
+    super.key,
     required this.child,
+    this.semanticsLabel,
     this.textColor = PlateStyles.keyboardButtonTextColorDark,
     this.textSize = 14,
     this.color = PlateStyles.keyboardButtonColorDark,
@@ -13,11 +14,13 @@ class KeyboardButton extends StatefulWidget {
     this.disabledColor = PlateStyles.keyboardButtonDisabledColorDark,
     this.borderRadius = const BorderRadius.all(Radius.circular(8.0)),
     required this.onPressed,
-  })   : assert(pressedOpacity >= 0.0 && pressedOpacity <= 1.0),
-        super(key: key);
+  }) : assert(pressedOpacity >= 0.0 && pressedOpacity <= 1.0);
 
   /// 内容
   final Widget child;
+
+  /// 无障碍语义标签，为空时从子组件推导
+  final String? semanticsLabel;
 
   /// 按键字体颜色
   final Color textColor;
@@ -44,7 +47,7 @@ class KeyboardButton extends StatefulWidget {
   bool get enabled => onPressed != null;
 
   @override
-  _KeyboardButtonState createState() => _KeyboardButtonState();
+  State<KeyboardButton> createState() => _KeyboardButtonState();
 }
 
 class _KeyboardButtonState extends State<KeyboardButton> {
@@ -64,21 +67,25 @@ class _KeyboardButtonState extends State<KeyboardButton> {
       onTap: widget.onPressed,
       child: Opacity(
         opacity: _buttonPressed ? widget.pressedOpacity : 1.0,
-        child: Container(
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: widget.borderRadius,
-          ),
-          child: Center(
-            widthFactor: 1,
-            heightFactor: 1,
-            child: DefaultTextStyle(
-              style: TextStyle(
-                color: textColor,
-                fontSize: widget.textSize,
-                fontWeight: FontWeight.normal,
+        child: Semantics(
+          button: true,
+          label: widget.semanticsLabel,
+          child: Container(
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: widget.borderRadius,
+            ),
+            child: Center(
+              widthFactor: 1,
+              heightFactor: 1,
+              child: DefaultTextStyle(
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: widget.textSize,
+                  fontWeight: FontWeight.normal,
+                ),
+                child: widget.child,
               ),
-              child: widget.child,
             ),
           ),
         ),

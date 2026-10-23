@@ -22,7 +22,7 @@ Flutter package for inputting chinese license plate number.
 
 ```yaml
 dependencies:
-  license_plate_number: ^2.0.1
+  license_plate_number: ^2.1.0
 ```
 
 ### Basic usage
@@ -33,18 +33,19 @@ Package includes two main widgets，`PlateInputField` and `PlateKeyboard`.
 
 ```dart
 Container(
+  alignment: Alignment.center,
   child: PlateInputField(
     placeHolder: '沪A12345',
-    style: PlateStyle.light,
+    styles: PlateStyles.light,
     inputFieldWidth: 40,
     inputFieldHeight: 54,
-    onChange: (List<String> array, String value) {
+    autoCompleteLength: 7, // auto complete after 7 chars, use 8 for new energy plates
+    onChanged: (List<String> array, String value) {
       // e.g.
-      // array ['沪', 'A', '1', '2', '3', '4', '5', '6']
-      // value 沪A123456
+      // array ['沪', 'A', '1', '2', '3', '4', '5']
+      // value 沪A12345
     },
-  );
-  alignment: Alignment.center,
+  ),
 )
 ```
 
@@ -127,7 +128,7 @@ PlateStyles(
 ```dart
 /// 2. Copy with a default style.
 PlateStyles.dark.copyWith(
-  keyboardBackgroundColorDark: Color(0xFF000000),
+  keyboardBackgroundColor: Color(0xFF000000),
 );
 ```
 
