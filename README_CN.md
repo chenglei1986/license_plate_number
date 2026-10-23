@@ -10,10 +10,11 @@ Flutter 车牌号输入组件，包含一个输入框和一个键盘。
 - 键盘支持横屏展示
 - 内部处理了 Android 返回键的监听，点击返回键隐藏键盘
 - 车牌号可选中单个号码进行修改
+- 数据驱动的多制式车牌，内置中国、韩国、美国、日本四种模式
 
-![](screenshots/screenshot_portrait.jpeg)
+![](screenshots/screenshot_portrait.png)
 
-![](screenshots/screenshot_landscape.jpeg)
+![](screenshots/screenshot_landscape.png)
 
 
 ## 使用说明
@@ -84,8 +85,16 @@ PlateInputField(
   enableHapticFeedback: true,
   /// 可选：点击输入框空白区域收起键盘
   dismissOnTapOutside: true,
+  /// 可选：自定义完成按钮文字
+  completeText: '完成',
+  /// 可选：监听每个按键（退格为空字符串）
+  onKeyPressed: (key) => print(key),
 );
 ```
+
+注意：`dismissOnTapOutside` 仅覆盖输入框自身区域。如需点击页面任意空白处收起键盘，
+请在页面层包一层 `GestureDetector` 调用 `KeyboardController.hideKeyboard`（见示例工程）。
+其他可选参数：`newEnergyPlaceHolder`、`semanticsLabel`、`pattern`。
 
 键盘规则：第 8 位（新能源）仅允许字母 D/F 和数字；特殊后缀键（学/领/警/港/澳/挂/临）
 仅在普通车牌最后一位可用；省份页同时提供军车字头（军/空/海/北/沈/兰/济/南/广/成）。

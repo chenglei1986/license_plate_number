@@ -12,9 +12,9 @@ topics:
 
 screenshots:
   - description: 'Portrait'
-    path: screenshots/screenshot_portrait.jpeg
+    path: screenshots/screenshot_portrait.png
   - description: 'Landscape'
-    path: screenshots/screenshot_landscape.jpeg
+    path: screenshots/screenshot_landscape.png
 
 environment:
   sdk: ^3.7.2

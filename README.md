@@ -9,10 +9,11 @@ Flutter package for inputting chinese license plate number.
 - Build-in one light style and one dark style, and the style can be changed.
 - Supporting landscape.
 - Plate numbers can be edited separately.
+- Data-driven plate patterns with built-in China, Korea, US and Japan formats.
 
-![](screenshots/screenshot_portrait.jpeg)
+![](screenshots/screenshot_portrait.png)
 
-![](screenshots/screenshot_landscape.jpeg)
+![](screenshots/screenshot_landscape.png)
 
 
 
@@ -84,8 +85,18 @@ PlateInputField(
   enableHapticFeedback: true,
   /// Optional: hide the keyboard when tapping outside the input fields
   dismissOnTapOutside: true,
+  /// Optional: customize the complete button label
+  completeText: '完成',
+  /// Optional: observe every key press (empty string for backspace)
+  onKeyPressed: (key) => print(key),
 );
 ```
+
+Note: `dismissOnTapOutside` only covers the input field's own area. To
+dismiss when tapping anywhere on the page, wrap your page with a
+`GestureDetector` that calls `KeyboardController.hideKeyboard` (see the
+example app). Other optional parameters: `newEnergyPlaceHolder`,
+`semanticsLabel`, `pattern`.
 
 Keyboard rules: the 8th position (new energy) only allows letters D/F and
 digits; special suffix keys (学/领/警/港/澳/挂/临) are enabled on the last
