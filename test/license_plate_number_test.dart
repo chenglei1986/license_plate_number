@@ -540,6 +540,65 @@ void main() {
       expect(controller.isKeyboardShowing(), isTrue);
     });
 
+    testWidgets(
+      'changing styles or pattern via the widget does not crash when the keyboard overlay is mounted',
+      (tester) async {
+        final controller = KeyboardController();
+        Widget build({PlateStyles? styles, PlatePattern? pattern}) => _wrap(
+          PlateInputField(
+            keyboardController: controller,
+            styles: styles ?? PlateStyles.dark,
+            pattern: pattern ?? PlatePatterns.china,
+          ),
+        );
+
+        await tester.pumpWidget(build());
+        controller.showKeyboard(tester.element(find.byType(PlateInputField)));
+        await tester.pumpAndSettle();
+
+        // didUpdateWidget runs while the overlay is mounted (e.g. theme
+        // toggle); it must not call markNeedsBuild during build.
+        await tester.pumpWidget(
+          build(styles: PlateStyles.light, pattern: PlatePatterns.korea),
+        );
+        await tester.pump();
+        expect(tester.takeException(), isNull);
+        expect(controller.isKeyboardShowing(), isTrue);
+      },
+    );
+
+    testWidgets(
+      'japan classification letters are enabled only in lower positions',
+      (tester) async {
+        final controller =
+            KeyboardController()
+              ..pattern = PlatePatterns.japan
+              ..plateNumber = '品川5';
+        final typed = <String>[];
+        await tester.pumpWidget(
+          _wrap(
+            PlateKeyboard(
+              keyboardController: controller,
+              onChange: (index, value) => typed.add(value),
+            ),
+          ),
+        );
+
+        // Slot 3 (first classification digit): digits only, no letter keys.
+        expect(controller.cursorIndex, 3);
+        expect(find.text('A'), findsNothing);
+
+        // Slot 4 (second classification digit, since 2018): letters allowed.
+        await tester.tap(find.text('0'));
+        await tester.pumpAndSettle();
+        expect(controller.cursorIndex, 4);
+        expect(find.text('A'), findsOneWidget);
+        await tester.tap(find.text('A'));
+        await tester.pumpAndSettle();
+        expect(typed, ['0', 'A']);
+      },
+    );
+
     testWidgets('malformed displayRows throws ArgumentError', (tester) async {
       const bad = PlatePattern(
         code: 'BAD',

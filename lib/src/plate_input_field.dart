@@ -153,9 +153,20 @@ class _PlateInputFieldState extends State<PlateInputField>
   }
 
   @override
-  void didUpdateWidget(PlateInputField oldWidget) {
+  void didUpdateWidget(covariant PlateInputField oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _syncControllerConfig();
+    // didUpdateWidget 处于 build 阶段，不能此时 markNeedsBuild 刷新悬浮键盘
+    // （否则会抛 setState()/markNeedsBuild() called during build）。
+    // 配置变化统一推迟到帧结束后同步。
+    if (oldWidget.pattern != widget.pattern ||
+        oldWidget.styles != widget.styles ||
+        oldWidget.completeText != widget.completeText ||
+        oldWidget.enableHapticFeedback != widget.enableHapticFeedback ||
+        oldWidget.onKeyPressed != widget.onKeyPressed) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _syncControllerConfig();
+      });
+    }
   }
 
   /// 把 widget 配置同步到控制器（含模式切换时的键盘刷新）。
