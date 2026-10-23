@@ -442,4 +442,80 @@ void main() {
       expect(() => controller.plateNumber = 'ABCDEFGH', throwsArgumentError);
     });
   });
+
+  group('multi-row patterns', () {
+    testWidgets('japan pattern renders two rows of slots', (tester) async {
+      await tester.pumpWidget(
+        _wrap(const PlateInputField(pattern: PlatePatterns.japan)),
+      );
+      final rows = find.descendant(
+        of: find.byType(PlateInputField),
+        matching: find.byType(Row),
+      );
+      // 11 slots in two rows: 6 + 5, no separators.
+      expect(rows, findsNWidgets(2));
+      expect(tester.widget<Row>(rows.at(0)).children.length, 6);
+      expect(tester.widget<Row>(rows.at(1)).children.length, 5);
+    });
+
+    testWidgets('japan pattern switches pages across rows', (tester) async {
+      final controller = KeyboardController()..pattern = PlatePatterns.japan;
+      final typed = <String>[];
+      await tester.pumpWidget(
+        _wrap(
+          PlateKeyboard(
+            keyboardController: controller,
+            onChange: (index, value) => typed.add(value),
+          ),
+        ),
+      );
+
+      // Slot 0: region kanji page.
+      expect(find.text('品'), findsOneWidget);
+      expect(find.text('あ'), findsNothing);
+
+      // Type kanji, then digits until the hiragana slot.
+      for (final ch in ['品', '川', '谷', '5', '0', '0']) {
+        await tester.tap(find.text(ch));
+        await tester.pumpAndSettle();
+      }
+      expect(controller.cursorIndex, 6);
+
+      // Slot 6: hiragana page.
+      expect(find.text('さ'), findsOneWidget);
+      expect(find.text('品'), findsNothing);
+      expect(find.text('1'), findsNothing);
+
+      await tester.tap(find.text('さ'));
+      await tester.pumpAndSettle();
+      expect(typed, ['品', '川', '谷', '5', '0', '0', 'さ']);
+
+      // Slot 7: back to the digit page for the serial number.
+      expect(find.text('1'), findsOneWidget);
+    });
+
+    testWidgets('malformed displayRows throws ArgumentError', (tester) async {
+      const bad = PlatePattern(
+        code: 'BAD',
+        name: 'bad',
+        slots: [
+          PlateSlot({'A'}),
+          PlateSlot({'B'}),
+        ],
+        keyPages: [
+          KeyPage(
+            columns: 2,
+            keys: ['A', 'B'],
+            aspectRatioPortrait: 1,
+            aspectRatioLandscape: 1,
+          ),
+        ],
+        displayRows: [
+          [0],
+        ],
+      );
+      await tester.pumpWidget(_wrap(const PlateInputField(pattern: bad)));
+      expect(tester.takeException(), isArgumentError);
+    });
+  });
 }

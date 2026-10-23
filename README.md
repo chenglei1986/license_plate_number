@@ -96,7 +96,8 @@ Custom patterns: the keyboard layout and per-position rules are described by
 `PlatePattern` (slots, key pages, separators). `PlatePatterns.china` is the
 default; pass `pattern:` to `PlateInputField` to use another country format.
 Built-in patterns: `PlatePatterns.china`, `PlatePatterns.korea`,
-`PlatePatterns.unitedStates`.
+`PlatePatterns.unitedStates`, `PlatePatterns.japan` (two-row layout via
+`displayRows`).
 
 
 ### Styles

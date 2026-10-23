@@ -44,6 +44,7 @@ class PlatePattern {
     required this.slots,
     required this.keyPages,
     this.slotSeparators = const [],
+    this.displayRows = const [],
   });
 
   /// 模式代码，如 CN、US、JP
@@ -60,6 +61,10 @@ class PlatePattern {
 
   /// 在该槽位之后展示分隔符（如省份与序号之间）
   final List<int> slotSeparators;
+
+  /// 多行展示分组：每个子列表是一行展示的槽位索引。
+  /// 为空表示所有槽位单行展示。提供时必须恰好覆盖每个槽位一次。
+  final List<List<int>> displayRows;
 
   /// 槽位数
   int get length => slots.length;
@@ -161,5 +166,53 @@ abstract final class PlatePatterns {
       ),
     ],
     slotSeparators: [2],
+  );
+
+  /// 日本车牌（两行布局）：上排为地域名（汉字槽位）与 3 位分类号码，
+  /// 下排为平假名与 4 位数字，如 品川 500 / さ 1234。
+  ///
+  /// 地域汉字集合为常用子集，完整数据需按各地域名补充。
+  static const PlatePattern japan = PlatePattern(
+    code: 'JP',
+    name: '日本车牌（两行）',
+    slots: [
+      // 上排：地域名 + 分类号码
+      PlateSlot({...regionKanji}, keyPage: 0),
+      PlateSlot({...regionKanji}, keyPage: 0),
+      PlateSlot({...regionKanji}, keyPage: 0),
+      PlateSlot({...numbers}, keyPage: 1),
+      PlateSlot({...numbers}, keyPage: 1),
+      PlateSlot({...numbers}, keyPage: 1),
+      // 下排：平假名 + 数字
+      PlateSlot({...hiragana}, keyPage: 2),
+      PlateSlot({...numbers}, keyPage: 1),
+      PlateSlot({...numbers}, keyPage: 1),
+      PlateSlot({...numbers}, keyPage: 1),
+      PlateSlot({...numbers}, keyPage: 1),
+    ],
+    keyPages: [
+      KeyPage(
+        columns: 8,
+        keys: regionKanji,
+        aspectRatioPortrait: 3 / 4,
+        aspectRatioLandscape: 2 / 1,
+      ),
+      KeyPage(
+        columns: 5,
+        keys: numbers,
+        aspectRatioPortrait: 3 / 2,
+        aspectRatioLandscape: 3 / 1,
+      ),
+      KeyPage(
+        columns: 7,
+        keys: hiragana,
+        aspectRatioPortrait: 3 / 4,
+        aspectRatioLandscape: 2 / 1,
+      ),
+    ],
+    displayRows: [
+      [0, 1, 2, 3, 4, 5],
+      [6, 7, 8, 9, 10],
+    ],
   );
 }

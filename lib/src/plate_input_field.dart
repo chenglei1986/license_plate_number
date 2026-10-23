@@ -24,10 +24,6 @@ class PlateInputField extends StatefulWidget {
     this.onCompleted,
     this.onKeyPressed,
   }) : assert(
-         placeHolder.length <= 8,
-         'plateNumber\'s length should be less than or equal to 8.',
-       ),
-       assert(
          autoCompleteLength == null ||
              (autoCompleteLength >= 1 && autoCompleteLength <= 8),
          'autoCompleteLength should be between 1 and 8.',
@@ -131,6 +127,19 @@ class _PlateInputFieldState extends State<PlateInputField>
         'Exceeds the slot count of the pattern.',
       );
     }
+    final rows = widget.pattern.displayRows;
+    if (rows.isNotEmpty) {
+      final flattened = rows.expand((row) => row).toList()..sort();
+      if (flattened.length != widget.pattern.slots.length ||
+          flattened.first != 0 ||
+          flattened.last != widget.pattern.slots.length - 1) {
+        throw ArgumentError.value(
+          widget.pattern.displayRows,
+          'displayRows',
+          'Must cover every slot exactly once.',
+        );
+      }
+    }
     _keyboardController.plateNumber = plateNumber;
     _keyboardController.onPlateNumberChanged = onPlateNumberChanged;
     _keyboardController.animationController = _controller;
@@ -194,10 +203,7 @@ class _PlateInputFieldState extends State<PlateInputField>
                 textField: true,
                 label: widget.semanticsLabel,
                 value: value.isEmpty ? null : value,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: _buildInputFields(),
-                ),
+                child: _buildInputFields(),
               );
               if (widget.dismissOnTapOutside) {
                 field = GestureDetector(
@@ -218,10 +224,31 @@ class _PlateInputFieldState extends State<PlateInputField>
     );
   }
 
-  List<Widget> _buildInputFields() {
+  Widget _buildInputFields() {
+    final pattern = widget.pattern;
+    final displayRows = pattern.displayRows;
+    if (displayRows.isEmpty) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: _buildSlotsRow(List.generate(pattern.slots.length, (i) => i)),
+      );
+    }
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (final row in displayRows)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: _buildSlotsRow(row),
+          ),
+      ],
+    );
+  }
+
+  List<Widget> _buildSlotsRow(List<int> slotIndices) {
     final pattern = widget.pattern;
     List<Widget> children = [];
-    for (int i = 0; i < pattern.slots.length; i++) {
+    for (final i in slotIndices) {
       children.add(_buildSingleField(_keyboardController._plateNumbers[i], i));
       if (pattern.slotSeparators.contains(i)) {
         children.add(_buildSeparator());
