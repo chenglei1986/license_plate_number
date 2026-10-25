@@ -4,7 +4,7 @@ This file provides working guidelines for AI coding assistants in this repositor
 
 ## Project Overview
 
-`license_plate_number` is an open-source Flutter package published on [pub.dev](https://pub.dev/packages/license_plate_number) for **inputting Chinese license plate numbers**. Current version 2.1.0, migrated to null safety.
+`license_plate_number` is an open-source Flutter package published on [pub.dev](https://pub.dev/packages/license_plate_number) for **inputting Chinese license plate numbers**. Current version 3.0.0, migrated to null safety.
 
 Core features:
 

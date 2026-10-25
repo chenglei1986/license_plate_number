@@ -1,4 +1,7 @@
-## 2.1.0
+## 3.0.0
+
+- **Breaking change**: `PlateKeyboard.keyboardController` is now required. When `PlateKeyboard` is used on its own, a `KeyboardController` must be created and passed in. `PlateInputField` is not affected, its `keyboardController` stays optional.
+- **Breaking change**: the SDK constraint is now `^3.7.2`, so Dart 3.7.2 or later is required and the package is null-safety only. The previous release supported Dart `>=2.12.0 <3.0.0`.
 
 - Fix a resource leak: `AnimationController` was not disposed in `PlateInputField`.
 - Migrate from the deprecated `WillPopScope` to `PopScope`.
@@ -15,7 +18,7 @@
 - Add haptic feedback (opt-in) and a key press scale animation to keyboard keys.
 - Add `clear()` and `characters` to `KeyboardController`.
 - Make `keyboardController` a required parameter of `PlateKeyboard`.
-- Add pubspec topics, issue tracker and screenshots; grow tests to 22 cases.
+- Add pubspec topics, issue tracker and screenshots; grow the test suite.
 - Introduce the `PlatePattern` data model (`PlateSlot` / `KeyPage` / `PlatePatterns`): slot character sets, key pages and separators are now data-driven; the built-in `PlatePatterns.china` reproduces the previous hardcoded behavior and all existing tests pass unchanged.
 - Add `PlatePatterns.korea` (123가4567, hangul key page) and `PlatePatterns.unitedStates` (generic 3+4 lenient mode) to validate the pattern abstraction; `autoCompleteLength` now defaults to the pattern's slot count.
 - Align the built-in patterns with local regulations (verified against MOLIT/KOTI, the Japanese 自動車登録規則/JAF and AAMVA/state DMV sources): Korea now uses the correct private-car hangul set (24 letters ending 구누두루무, replacing the incorrect 버서어저); Japan uses the 42 hiragana actually issued (お・し・へ・ん are never used) and adds the 2018 rule allowing letters A/C/F/H/K/L/M/P/X/Y in the lower two classification-number positions.

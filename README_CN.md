@@ -36,8 +36,18 @@ Flutter 车牌号输入组件，包含一个输入框和一个键盘。
 
 ```yaml
 dependencies:
-  license_plate_number: ^2.1.0
+  license_plate_number: ^3.0.0
 ```
+
+### 升级到 3.0.0
+
+相比 `2.0.1`，本次发布包含两处不兼容变更：
+
+- SDK 约束改为 `^3.7.2`，要求 **Dart 3.7.2 及以上**，且仅支持空安全（null safety）。
+  升级前请先更新 Dart SDK，并同步修改应用的 `environment: sdk:` 约束。
+- `PlateKeyboard.keyboardController` 现在是**必填参数**。单独使用 `PlateKeyboard` 时，
+  必须自行创建 `KeyboardController` 并传入（见下方 `PlateKeyboard` 示例）。
+  `PlateInputField` 不受影响，其 `keyboardController` 参数仍为可选。
 
 ### 基本用法
 
@@ -64,6 +74,16 @@ Container(
 ```
 
 `PlateKeyboard` 不直接使用，键盘的弹出与内容切换，由 `PlateInputField` 在内部控制，如果要在外部控制键盘的弹出与隐藏，可通过 `KeyboardController` 实现。
+
+如果单独使用 `PlateKeyboard`，则必须传入 `keyboardController`：
+
+```dart
+final KeyboardController _keyboardController = KeyboardController();
+
+PlateKeyboard(
+  keyboardController: _keyboardController,
+);
+```
 
 ```dart
 /// 定义 KeyboardController

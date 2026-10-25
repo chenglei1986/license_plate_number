@@ -32,8 +32,20 @@ the allowed characters of every position come from the pattern data.
 
 ```yaml
 dependencies:
-  license_plate_number: ^2.1.0
+  license_plate_number: ^3.0.0
 ```
+
+### Upgrading to 3.0.0
+
+Compared with `2.0.1`, this release contains two breaking changes:
+
+- The SDK constraint is now `^3.7.2`: **Dart 3.7.2 or later** is required and the
+  package is null-safety only. Upgrade your Dart SDK and the `environment: sdk:`
+  constraint of your app before depending on this version.
+- `PlateKeyboard.keyboardController` is now **required**. Standalone use of
+  `PlateKeyboard` must create a `KeyboardController` and pass it in (see the
+  `PlateKeyboard` example below). `PlateInputField` is not affected: its own
+  `keyboardController` parameter stays optional.
 
 ### Basic usage
 
@@ -60,6 +72,16 @@ Container(
 ```
 
 `PlateKeyboard` is usually not used directly. It is controlled by `PlateInputField`. But we also provide `KeyboardController` to show/hide the keyboard by yourself.
+
+If you use `PlateKeyboard` on its own, `keyboardController` is required:
+
+```dart
+final KeyboardController _keyboardController = KeyboardController();
+
+PlateKeyboard(
+  keyboardController: _keyboardController,
+);
+```
 
 ```dart
 /// KeyboardController
